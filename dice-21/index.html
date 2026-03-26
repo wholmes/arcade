@@ -581,15 +581,6 @@
         font-size: 12px;
         color: #7a8a9e;
       }
-      .d21-copyright {
-        margin: 14px 0 0;
-        padding-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-        font-size: 11px;
-        line-height: 1.35;
-        color: #5a6a7e;
-        letter-spacing: 0.02em;
-      }
       /* Collapsed = one line; open = breakdown + clear (saves vertical space) */
       .lifetime-details {
         margin: 8px 0 0;
@@ -676,6 +667,121 @@
       }
       .ach-row.unlocked .ach-desc {
         color: #8a9aaf;
+      }
+      /* Career tournaments (optional series — same lifetime stats) */
+      #d21TournamentToast {
+        position: fixed;
+        z-index: 120;
+        left: 50%;
+        bottom: max(16px, env(safe-area-inset-bottom, 0px));
+        transform: translateX(-50%);
+        max-width: min(92vw, 22rem);
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 12px;
+        line-height: 1.4;
+        color: rgba(230, 236, 248, 0.96);
+        background: rgba(18, 22, 34, 0.94);
+        border: 1px solid rgba(232, 200, 122, 0.35);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s;
+      }
+      #d21TournamentToast.is-visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      #d21TournamentToast strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #f0d78c;
+        font-weight: 700;
+      }
+      .d21-tournament-toast-sub {
+        display: block;
+        color: rgba(180, 195, 218, 0.95);
+      }
+      #d21TournamentActive {
+        margin: 10px 0 0;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(232, 200, 122, 0.28);
+        background: rgba(24, 28, 42, 0.55);
+      }
+      #d21TournamentActive[hidden] {
+        display: none !important;
+      }
+      #d21TournamentActiveTitle {
+        margin: 0 0 4px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #e8d4a8;
+        line-height: 1.35;
+      }
+      #d21TournamentActiveScore {
+        margin: 0 0 6px;
+        font-size: 11px;
+        color: #8a9aaf;
+        line-height: 1.35;
+      }
+      #d21TournamentAbandon {
+        font-size: 11px;
+        padding: 4px 8px;
+      }
+      .d21-tournament-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: min(38vh, 280px);
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-right: 4px;
+        scrollbar-gutter: stable;
+      }
+      .d21-tournament-row {
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .d21-tournament-row:last-child {
+        border-bottom: none;
+      }
+      .d21-tournament-row-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 4px 10px;
+        margin-bottom: 4px;
+      }
+      .d21-tournament-name {
+        font-weight: 700;
+        font-size: 11px;
+        color: #c8d4e8;
+      }
+      .d21-tournament-prize {
+        font-size: 10px;
+        color: #9aa8bc;
+      }
+      .d21-tournament-row.cleared .d21-tournament-name {
+        color: #6a9e7a;
+      }
+      .d21-tournament-row.active .d21-tournament-name {
+        color: #e8d4a8;
+      }
+      .d21-tournament-status {
+        margin: 0 0 6px;
+        font-size: 10px;
+        line-height: 1.35;
+        color: #6a7a8e;
+      }
+      .d21-tournament-row.eligible .d21-tournament-status {
+        color: #8a9aaf;
+      }
+      .d21-tournament-enter {
+        font-size: 11px;
+        padding: 5px 10px;
       }
       /* Table felt — fixed bottom-right (mirrors #chipDock) */
       #feltDock {
@@ -1056,6 +1162,14 @@
         color: #e8e8f0;
         border-color: rgba(255, 255, 255, 0.12);
       }
+      .chip-btn.chip-d500 {
+        background: linear-gradient(165deg, #6b4fd8, #3a1f8c);
+        color: #f4f0ff;
+      }
+      .chip-btn.chip-d1000 {
+        background: linear-gradient(165deg, #d4a017, #8a5a00);
+        color: #1a1204;
+      }
       #betHud {
         font-size: 10px;
         line-height: 1.35;
@@ -1063,9 +1177,9 @@
         margin: 6px 0 0;
         width: 100%;
       }
-      /* Lifetime progress meter — hidden (details live behind ? instead) */
+      /* Lifetime progress toward next max-bet unlock (hint line + ? for paths) */
       .d21-stake-meter {
-        display: none;
+        margin: 8px 0 0;
       }
       .d21-stake-meter-head {
         display: flex;
@@ -2426,7 +2540,9 @@
         border-radius: 2px;
       }
     </style>
+    <script src="/arcade/assets/dice21-rules.js"></script>
     <script src="/arcade/assets/dice21-badge-showcase.js"></script>
+    <script src="/arcade/assets/dice21-tournaments.js" defer></script>
     <script type="module" crossorigin src="/arcade/assets/dice21-DU7nhPGz.js"></script>
     <link rel="modulepreload" crossorigin href="/arcade/assets/modulepreload-polyfill-B5Qt9EMX.js">
   </head>
@@ -2678,6 +2794,7 @@
         <p id="powerUpSub"></p>
       </div>
     </div>
+    <div id="d21TournamentToast" class="d21-tournament-toast" hidden aria-live="polite" aria-atomic="true"></div>
     <div id="d21StakesUp" class="d21-stakes-up" aria-hidden="true">
       <div id="d21StakesUpBackdrop" aria-hidden="true"></div>
       <div
@@ -2691,7 +2808,7 @@
           <span class="d21-stakes-up-chip d21-stakes-up-chip--2"></span>
           <span class="d21-stakes-up-chip d21-stakes-up-chip--1"></span>
         </div>
-        <p id="d21StakesUpHeading" class="d21-stakes-up-kicker">New table unlocked</p>
+        <p id="d21StakesUpHeading" class="d21-stakes-up-kicker">Higher limits unlocked</p>
         <p class="d21-stakes-up-amount" id="d21StakesUpAmt">$5</p>
         <p class="d21-stakes-up-detail" id="d21StakesUpDetail"></p>
         <button type="button" class="d21-stakes-up-btn" id="d21StakesUpDismiss">Continue</button>
@@ -2715,11 +2832,11 @@
           <h3>Two stats</h3>
           <ul>
             <li>
-              <strong>Hands</strong> — lifetime hands finished (the first number in pairs like <code>96/15</code>).
+              <strong>Hands</strong> — lifetime hands finished (the first number in pairs like <code>96/12</code>).
             </li>
             <li>
               <strong>$ won</strong> — lifetime total of <strong>pot payouts on your wins</strong> (full pot each time, not
-              net profit). Shown like <code>$82/$250</code>: you have <strong>$82</strong> toward a <strong>$250</strong>
+              net profit). Shown like <code>$32/$50</code>: you have <strong>$32</strong> toward a <strong>$50</strong>
               requirement.
             </li>
           </ul>
@@ -2727,13 +2844,13 @@
         <div class="d21-stake-help-section">
           <h3>Example: unlocking $5 max bet</h3>
           <ul>
-            <li><strong>Standard</strong> — at least <strong>15</strong> lifetime hands <em>and</em> at least <strong>$250</strong>
+            <li><strong>Standard</strong> — at least <strong>12</strong> lifetime hands <em>and</em> at least <strong>$50</strong>
               in lifetime pot wins.</li>
             <li>
-              <strong>Hot A</strong> — <strong>10</strong> hands and <strong>$320</strong> won (fewer hands, more winnings).
+              <strong>Hot A</strong> — <strong>8</strong> hands and <strong>$72</strong> won (fewer hands, more winnings).
             </li>
             <li>
-              <strong>Hot B</strong> — <strong>25</strong> hands and <strong>$200</strong> won (more hands, lower $ bar).
+              <strong>Hot B</strong> — <strong>22</strong> hands and <strong>$40</strong> won (more hands, lower $ bar).
             </li>
           </ul>
         </div>
@@ -2758,6 +2875,8 @@
         <button type="button" class="chip-btn chip-d5" data-denom="5" aria-pressed="false">$5</button>
         <button type="button" class="chip-btn chip-d25" data-denom="25" aria-pressed="false">$25</button>
         <button type="button" class="chip-btn chip-d100" data-denom="100" aria-pressed="false">$100</button>
+        <button type="button" class="chip-btn chip-d500" data-denom="500" aria-pressed="false" hidden>$500</button>
+        <button type="button" class="chip-btn chip-d1000" data-denom="1000" aria-pressed="false" hidden>$1000</button>
       </div>
       <p id="betHud" class="label-muted">Bet $1 · next pot $2</p>
       <div class="d21-stake-meter" id="d21StakeMeter">
@@ -2793,7 +2912,7 @@
       </div>
     </div>
     <div id="feltDock">
-      <!-- Felt swatches hidden: table felt follows stake tier (see d21ApplyTableTheme). -->
+      <!-- Felt swatches hidden: default felt is fixed; stake tier only unlocks higher bet limits + bankroll scale. -->
       <div class="felt-picker-section" hidden>
         <p class="bet-dock-label">Felt</p>
         <div class="felt-picker" role="group" aria-label="Table felt">
@@ -2900,6 +3019,20 @@
           <summary><span class="label-muted">Badges</span> <span id="achCount">0/6</span></summary>
           <div class="lifetime-body ach-body" id="achList"></div>
         </details>
+        <details class="lifetime-details ach-details" id="d21TournamentDetails">
+          <summary>
+            <span class="label-muted">Tournaments</span> <span id="d21TournamentCount">0/6</span>
+          </summary>
+          <p class="label-muted" style="margin: 0 0 8px; font-size: 10px; line-height: 1.4">
+            Optional best-of series (first to 2 wins). Same chips and lifetime stats — fantasy prizes only. Double-or-nothing is off during a series.
+          </p>
+          <div class="lifetime-body d21-tournament-list" id="d21TournamentList"></div>
+        </details>
+        <div id="d21TournamentActive" hidden aria-hidden="true">
+          <p id="d21TournamentActiveTitle" class="d21-tournament-active-title"></p>
+          <p id="d21TournamentActiveScore"></p>
+          <button type="button" class="ghost" id="d21TournamentAbandon">Leave tournament</button>
+        </div>
         <div class="btn-row" style="margin-top: 12px">
           <div class="btn-row-main">
             <button type="button" class="primary" id="btnDeal" aria-label="Place bet — match the house and roll">Bet</button>
@@ -2942,9 +3075,6 @@
             </div>
           </div>
         </div>
-        <p class="d21-copyright">
-          Dice 21 · © <span class="copyright-year"></span> Whittfield Holmes · All rights reserved
-        </p>
       </div>
     </div>
     </div>
