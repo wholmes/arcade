@@ -102,6 +102,8 @@ function setRole(role) {
 function applyGuestChrome(isGuest) {
   const sel = [
     '#btnDeal',
+    '#btnDealShake',
+    '#mqaPlay',
     '#btnHit',
     '#btnStand',
     '#gameMode',
@@ -151,10 +153,16 @@ function applyHud(hud) {
     ['ruleHint', hud.ruleHint],
     ['lifeSummary', hud.lifeSummary],
   ]
+  const hudNumIds = new Set(['playerTotal', 'aiTotal', 'potVal', 'chipsYou', 'chipsAi'])
   for (const [id, val] of map) {
     if (val === undefined) continue
     const el = $(id)
-    if (el) el.textContent = val
+    if (!el) continue
+    if (hudNumIds.has(id) && typeof window.d21HudGhostUpdate === 'function') {
+      window.d21HudGhostUpdate(el, val)
+    } else {
+      el.textContent = val
+    }
   }
 }
 
