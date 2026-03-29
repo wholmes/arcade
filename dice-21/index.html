@@ -2662,6 +2662,76 @@
           animation: none;
         }
       }
+      /* Compact HUD — hide lifetime / badges / tournaments (and badge showcase) for a shorter panel. */
+      html.d21-hud-compact #lifeDetails,
+      html.d21-hud-compact #achDetails,
+      html.d21-hud-compact #d21TournamentDetails,
+      html.d21-hud-compact #d21BadgeShowcase {
+        display: none !important;
+      }
+      /* Compact HUD — toast strip in the badge corner (tournament + new badge hints). */
+      html:not(.d21-hud-compact) #d21HudCompactPeek {
+        display: none !important;
+      }
+      .d21-hud-compact-peek {
+        position: fixed;
+        z-index: 2;
+        top: calc(max(12px, env(safe-area-inset-top)) + var(--d21-top-banner-offset, 56px));
+        left: max(12px, env(safe-area-inset-left));
+        width: min(88vw, 280px);
+        max-width: 280px;
+        pointer-events: auto;
+        user-select: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .d21-hud-compact-peek-inner {
+        padding: 8px 10px 9px;
+        border-radius: 12px;
+        background: linear-gradient(165deg, rgba(34, 38, 52, 0.92), rgba(16, 18, 28, 0.94));
+        border: 1px solid rgba(232, 200, 122, 0.28);
+        box-shadow:
+          0 10px 28px rgba(0, 0, 0, 0.38),
+          0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+      }
+      .d21-hud-compact-peek:focus-visible {
+        outline: 2px solid rgba(232, 200, 122, 0.45);
+        outline-offset: 2px;
+      }
+      .d21-hud-compact-peek-primary {
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.38;
+        color: rgba(230, 236, 248, 0.96);
+      }
+      .d21-hud-compact-peek-primary strong {
+        color: #f0d78c;
+        font-weight: 700;
+      }
+      .d21-hud-compact-peek-muted {
+        color: rgba(170, 188, 212, 0.95);
+        font-weight: 500;
+      }
+      .d21-hud-compact-peek-secondary {
+        margin: 6px 0 0;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 11px;
+        line-height: 1.38;
+        color: rgba(200, 220, 240, 0.96);
+      }
+      .d21-hud-compact-peek-secondary[hidden] {
+        display: none !important;
+      }
+      #d21HudCompactBtn .d21-hud-compact-glyph {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #d21HudCompactBtn .d21-hud-compact-glyph[hidden] {
+        display: none !important;
+      }
+
       /* Call server — compact popover anchored to the bell (no fullscreen dimmer). */
       .d21-server-anchor {
         position: relative;
@@ -3106,6 +3176,23 @@
         </div>
       </div>
       <div
+        id="d21HudCompactPeek"
+        class="d21-hud-compact-peek"
+        hidden
+        role="region"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-hidden="true"
+        aria-label="Highlights for compact HUD. Activate to expand the full panel."
+        title="Tap to expand HUD for full details"
+        tabindex="0"
+      >
+        <div class="d21-hud-compact-peek-inner">
+          <p id="d21HudCompactPeekPrimary" class="d21-hud-compact-peek-primary"></p>
+          <p id="d21HudCompactPeekSecondary" class="d21-hud-compact-peek-secondary" hidden></p>
+        </div>
+      </div>
+      <div
         id="d21BadgeBackdrop"
         class="d21-badge-backdrop"
         hidden
@@ -3525,6 +3612,31 @@
             <button type="button" class="secondary" id="btnStand" disabled>Stand</button>
           </div>
           <div class="btn-row-icons d21-server-anchor" role="toolbar" aria-label="Table quick actions">
+            <button
+              type="button"
+              class="icon-btn secondary"
+              id="d21HudCompactBtn"
+              aria-pressed="false"
+              title="Compact HUD — hide lifetime, badges, and tournaments"
+              aria-label="Compact HUD — hide lifetime, badges, and tournaments"
+            >
+              <span class="d21-hud-compact-glyph d21-hud-compact-glyph--to-compact" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="4 14 10 14 10 20" />
+                  <polyline points="20 10 14 10 14 4" />
+                  <line x1="14" y1="10" x2="21" y2="3" />
+                  <line x1="3" y1="21" x2="10" y2="14" />
+                </svg>
+              </span>
+              <span class="d21-hud-compact-glyph d21-hud-compact-glyph--to-expand" hidden aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 3 21 3 21 9" />
+                  <polyline points="9 21 3 21 3 15" />
+                  <line x1="21" y1="3" x2="14" y2="10" />
+                  <line x1="3" y1="21" x2="10" y2="14" />
+                </svg>
+              </span>
+            </button>
             <button
               type="button"
               class="icon-btn secondary"

@@ -192,6 +192,13 @@
     }
   }
 
+  function pushCompactPeek(title, score) {
+    if (typeof window.__d21HudCompactPeekSetTournament === 'function') {
+      if (!title) window.__d21HudCompactPeekSetTournament(null)
+      else window.__d21HudCompactPeekSetTournament({ title, score: score || '' })
+    }
+  }
+
   function updateStrip(run) {
     const wrap = document.getElementById('d21TournamentActive')
     const titleEl = document.getElementById('d21TournamentActiveTitle')
@@ -203,12 +210,14 @@
     }
     if (!wrap || !titleEl || !scoreEl) {
       syncMarqueeVsStrip(false)
+      pushCompactPeek(null)
       return
     }
     if (!run || isGuest()) {
       wrap.hidden = true
       wrap.setAttribute('aria-hidden', 'true')
       syncMarqueeVsStrip(false)
+      pushCompactPeek(null)
       return
     }
     let title = ''
@@ -221,6 +230,7 @@
     } else {
       wrap.hidden = true
       syncMarqueeVsStrip(false)
+      pushCompactPeek(null)
       return
     }
     titleEl.textContent = title
@@ -228,6 +238,13 @@
     wrap.hidden = false
     wrap.setAttribute('aria-hidden', 'false')
     syncMarqueeVsStrip(true)
+    pushCompactPeek(titleEl.textContent, scoreEl.textContent)
+  }
+
+  /** Re-run strip + compact peek (e.g. after mobile UI enables compact HUD). */
+  function syncCompactPeekStrip() {
+    const st = readState()
+    updateStrip(st.run)
   }
 
   function gateLifetime(lsH, lsW) {
@@ -552,6 +569,7 @@
   window.__d21TournamentReset = resetAll
   window.__d21TournamentGetTrophyFlags = getTrophyFlags
   window.__d21TournamentSeriesActive = seriesActive
+  window.__d21TournamentSyncCompactPeekStrip = syncCompactPeekStrip
 
   function d21TournamentDevAllowed() {
     try {

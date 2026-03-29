@@ -1,6 +1,6 @@
 /**
  * Mobile layout: corner docks move into a bottom sheet; quick bar keeps play + tools reachable.
- * Also persists collapsible UI (Lifetime / Badges details, rules panel) in localStorage.
+ * Also persists collapsible UI (Lifetime / Badges details, rules panel, compact HUD) in localStorage.
  *
  * Copyright © Whittfield Holmes. All rights reserved.
  */
@@ -10,6 +10,7 @@ const LS = {
   lifeDetails: 'd21_ui_lifeDetails_open',
   achDetails: 'd21_ui_achDetails_open',
   panelHelp: 'd21_ui_panelHelp_open',
+  hudCompact: 'd21_ui_hud_compact',
 }
 
 function $(id) {
@@ -172,6 +173,134 @@ function toggleBadgeOverlay() {
   setBadgeOverlayOpen(open)
 }
 
+function readHudCompactPref() {
+  try {
+    const v = localStorage.getItem(LS.hudCompact)
+    if (v === '1') return true
+    if (v === '0') return false
+  } catch {
+    /* ignore */
+  }
+  return null
+}
+
+function writeHudCompactPref(compact) {
+  try {
+    localStorage.setItem(LS.hudCompact, compact ? '1' : '0')
+  } catch {
+    /* ignore */
+  }
+}
+
+let peekTournamentTitle = ''
+let peekTournamentScore = ''
+let peekBadgeT = 0
+
+function clearHudCompactPeekBadgeFlash() {
+  clearTimeout(peekBadgeT)
+  peekBadgeT = 0
+  const sec = $('d21HudCompactPeekSecondary')
+  if (sec) {
+    sec.textContent = ''
+    sec.hidden = true
+  }
+}
+
+function refreshHudCompactPeek() {
+  const wrap = $('d21HudCompactPeek')
+  const pri = $('d21HudCompactPeekPrimary')
+  const sec = $('d21HudCompactPeekSecondary')
+  if (!wrap || !pri || !sec) return
+  if (!document.documentElement.classList.contains('d21-hud-compact')) {
+    wrap.hidden = true
+    wrap.setAttribute('aria-hidden', 'true')
+    return
+  }
+  const hasTour = !!(peekTournamentTitle || peekTournamentScore)
+  const hasBadge = !!(sec.textContent && !sec.hidden)
+  const show = hasTour || hasBadge
+  wrap.hidden = !show
+  wrap.setAttribute('aria-hidden', show ? 'false' : 'true')
+
+  pri.textContent = ''
+  if (peekTournamentTitle) {
+    const strong = document.createElement('strong')
+    strong.textContent = peekTournamentTitle
+    pri.appendChild(strong)
+  }
+  if (peekTournamentScore) {
+    if (peekTournamentTitle) pri.appendChild(document.createElement('br'))
+    const span = document.createElement('span')
+    span.className = 'd21-hud-compact-peek-muted'
+    span.textContent = peekTournamentScore
+    pri.appendChild(span)
+  }
+}
+
+/** @param {{ title?: string, score?: string } | null} payload */
+window.__d21HudCompactPeekSetTournament = function (payload) {
+  if (!payload) {
+    peekTournamentTitle = ''
+    peekTournamentScore = ''
+  } else {
+    peekTournamentTitle = payload.title || ''
+    peekTournamentScore = payload.score || ''
+  }
+  refreshHudCompactPeek()
+}
+
+window.__d21HudCompactPeekFlashBadge = function (label) {
+  if (!label || !document.documentElement.classList.contains('d21-hud-compact')) return
+  const sec = $('d21HudCompactPeekSecondary')
+  if (!sec) return
+  sec.textContent = 'New badge: ' + label
+  sec.hidden = false
+  clearTimeout(peekBadgeT)
+  peekBadgeT = setTimeout(() => {
+    sec.textContent = ''
+    sec.hidden = true
+    refreshHudCompactPeek()
+  }, 6500)
+  refreshHudCompactPeek()
+}
+
+/** Smaller HUD: hides lifetime / badges / tournaments blocks and the badge showcase strip. */
+function applyHudCompact(compact) {
+  document.documentElement.classList.toggle('d21-hud-compact', compact)
+  const btn = $('d21HudCompactBtn')
+  if (btn) {
+    btn.setAttribute('aria-pressed', compact ? 'true' : 'false')
+    const label = compact
+      ? 'Expand HUD — show lifetime, badges, and tournaments'
+      : 'Compact HUD — hide lifetime, badges, and tournaments'
+    btn.title = label
+    btn.setAttribute('aria-label', label)
+    const toCompact = btn.querySelector('.d21-hud-compact-glyph--to-compact')
+    const toExpand = btn.querySelector('.d21-hud-compact-glyph--to-expand')
+    if (toCompact && toExpand) {
+      toCompact.toggleAttribute('hidden', compact)
+      toExpand.toggleAttribute('hidden', !compact)
+    }
+  }
+  if (!compact) {
+    clearHudCompactPeekBadgeFlash()
+    peekTournamentTitle = ''
+    peekTournamentScore = ''
+    const wrap = $('d21HudCompactPeek')
+    const pri = $('d21HudCompactPeekPrimary')
+    if (pri) pri.textContent = ''
+    if (wrap) {
+      wrap.hidden = true
+      wrap.setAttribute('aria-hidden', 'true')
+    }
+  } else if (typeof window.__d21TournamentSyncCompactPeekStrip === 'function') {
+    window.__d21TournamentSyncCompactPeekStrip()
+  }
+  if (compact && isMobileLayout() && $('d21BadgeShowcase')?.classList.contains('is-badge-expanded')) {
+    setBadgeOverlayOpen(false)
+  }
+}
+
 function restoreDocks(app, ui) {
   const chipDock = $('chipDock')
   const feltDock = $('feltDock')
@@ -253,6 +382,25 @@ function init() {
   setMobileClass()
   syncPanelHelpToLayout()
   wirePanelHelpPersistence()
+
+  applyHudCompact(readHudCompactPref() === true)
+  $('d21HudCompactBtn')?.addEventListener('click', () => {
+    const next = !document.documentElement.classList.contains('d21-hud-compact')
+    applyHudCompact(next)
+    writeHudCompactPref(next)
+  })
+
+  function expandHudFromPeek() {
+    if (!document.documentElement.classList.contains('d21-hud-compact')) return
+    applyHudCompact(false)
+    writeHudCompactPref(false)
+  }
+  $('d21HudCompactPeek')?.addEventListener('click', expandHudFromPeek)
+  $('d21HudCompactPeek')?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    e.preventDefault()
+    expandHudFromPeek()
+  })
 
   const bar = $('mobileQuickBar')
   const backdrop = $('mobileSheetBackdrop')

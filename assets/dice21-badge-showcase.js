@@ -955,6 +955,9 @@
         void el.offsetWidth
         el.classList.add('d21-badge-slot--pop')
         window.setTimeout(() => el.classList.remove('d21-badge-slot--pop'), 1400)
+        if (typeof window.__d21HudCompactPeekFlashBadge === 'function') {
+          window.__d21HudCompactPeekFlashBadge(LABELS[id] || id)
+        }
       }
     })
 
