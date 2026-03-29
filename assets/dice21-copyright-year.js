@@ -1,5 +1,7 @@
 /**
  * Sets .copyright-year text — kept external so extension MV3 CSP allows the page (no inline scripts).
+ *
+ * Copyright © Whittfield Holmes. All rights reserved.
  */
 ;(function () {
   for (const el of document.querySelectorAll('.copyright-year')) {
