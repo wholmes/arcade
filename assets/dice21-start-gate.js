@@ -34,7 +34,7 @@
    * Fetches in small batches to avoid saturating the connection.
    */
   function preloadDjBackground() {
-    const manifestUrl = publicUrl('audio/dj/manifest.json')
+    const manifestUrl = publicUrl('audio/dj/dj-manifest.json')
     const concurrency = 2
 
     fetch(manifestUrl, { cache: 'force-cache' })

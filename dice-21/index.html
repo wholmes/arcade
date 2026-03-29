@@ -8,7 +8,7 @@
     <meta name="author" content="Whittfield Holmes" />
     <meta name="copyright" content="Copyright © Whittfield Holmes" />
     <title>Dice 21</title>
-    <link rel="icon" href="/arcade/assets/favicon-D8NRme3X.svg" type="image/svg+xml" />
+    <link rel="icon" href="/dice-21/assets/favicon-D8NRme3X.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -2912,6 +2912,39 @@
         text-align: center;
         pointer-events: auto;
       }
+      .d21-start-gate-credits {
+        margin: 0 auto 10px;
+        padding-bottom: 10px;
+        max-width: min(92vw, 28rem);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 9px;
+        line-height: 1.5;
+        color: rgba(150, 162, 182, 0.92);
+        text-align: center;
+      }
+      .d21-start-gate-credits-title {
+        margin: 0 0 6px;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(200, 184, 152, 0.88);
+      }
+      .d21-start-gate-credits p {
+        margin: 0 0 4px;
+      }
+      .d21-start-gate-credits p:last-child {
+        margin-bottom: 0;
+      }
+      .d21-start-gate-credits-more {
+        margin-top: 6px !important;
+        font-size: 8px;
+        opacity: 0.85;
+        color: rgba(120, 132, 152, 0.95);
+      }
+      .d21-start-gate-copyright-line {
+        margin: 0;
+      }
       .d21-start-gate-copyright a {
         color: #c9a86a;
         text-decoration: none;
@@ -2927,15 +2960,15 @@
         border-radius: 2px;
       }
     </style>
-    <script src="/arcade/assets/dice21-clear-storage.js"></script>
-    <script src="/arcade/assets/dice21-camera-loading-ui.js"></script>
-    <script src="/arcade/assets/dice21-cam-side-play-ui.js"></script>
-    <script src="/arcade/assets/dice21-rules.js"></script>
-    <script src="/arcade/assets/dice21-badge-showcase.js"></script>
-    <script src="/arcade/assets/dice21-top-banner.js" defer></script>
-    <script src="/arcade/assets/dice21-tournaments.js" defer></script>
-    <script type="module" crossorigin src="/arcade/assets/dice21-DU7nhPGz.js?v=dice21-core-lt8"></script>
-    <link rel="modulepreload" crossorigin href="/arcade/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <script src="/dice-21/assets/dice21-clear-storage.js"></script>
+    <script src="/dice-21/assets/dice21-camera-loading-ui.js"></script>
+    <script src="/dice-21/assets/dice21-cam-side-play-ui.js"></script>
+    <script src="/dice-21/assets/dice21-rules.js"></script>
+    <script src="/dice-21/assets/dice21-badge-showcase.js"></script>
+    <script src="/dice-21/assets/dice21-top-banner.js" defer></script>
+    <script src="/dice-21/assets/dice21-tournaments.js" defer></script>
+    <script type="module" crossorigin src="/dice-21/assets/dice21-DU7nhPGz.js?v=dice21-core-lt8"></script>
+    <link rel="modulepreload" crossorigin href="/dice-21/assets/modulepreload-polyfill-B5Qt9EMX.js">
   </head>
   <body>
     <div id="fileGate" hidden>
@@ -3009,10 +3042,32 @@
         <button type="button" id="d21StartBtn" class="d21-start-gate-btn" disabled>Tap to play</button>
       </div>
       <footer class="d21-start-gate-copyright" role="contentinfo">
-        © <span class="copyright-year"></span> Whittfield Holmes · All rights reserved ·
-        <a href="../privacy-policy/">Privacy policy</a>
-        ·
-        <a href="https://codemybrand.com/" target="_blank" rel="noopener noreferrer">Code My Brand</a>
+        <div class="d21-start-gate-credits" aria-label="Credits">
+          <p class="d21-start-gate-credits-title">Credits — Ambience DJ</p>
+          <p>
+            Music from #Uppbeat (free for Creators!):
+            <a
+              href="https://uppbeat.io/t/21-on-the-block/lush"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="https://uppbeat.io/t/21-on-the-block/lush"
+              >Lush</a>
+          </p>
+          <p>
+            Music from #Uppbeat (free for Creators!):
+            <a
+              href="https://uppbeat.io/t/icosphere/silk"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="https://uppbeat.io/t/icosphere/silk"
+              >Silk</a>
+          </p>
+          <p class="d21-start-gate-credits-more">More credits coming later.</p>
+        </div>
+        <p class="d21-start-gate-copyright-line">
+          © <span class="copyright-year"></span> Whittfield Holmes · All rights reserved ·
+          <a href="https://codemybrand.com/" target="_blank" rel="noopener noreferrer">Code My Brand</a>
+        </p>
       </footer>
     </div>
     <div id="app">
@@ -3344,7 +3399,7 @@
         <span class="d21-dock-toggle-switch" aria-hidden="true"><span class="d21-dock-toggle-knob"></span></span>
         <span class="d21-dock-toggle-text">Room ambience</span>
       </label>
-      <label class="d21-dock-toggle" title="Random tracks from /audio/dj/*.wav (see manifest.json; run npm run dj:manifest after adding files)">
+      <label class="d21-dock-toggle" title="Random tracks from /audio/dj/*.wav (see dj-manifest.json; run npm run dj:manifest after adding files)">
         <input type="checkbox" id="d21AmbDjPref" class="d21-dock-toggle-input" checked />
         <span class="d21-dock-toggle-switch" aria-hidden="true"><span class="d21-dock-toggle-knob"></span></span>
         <span class="d21-dock-toggle-text">Ambience DJ</span>
@@ -3508,14 +3563,10 @@
       </div>
     </div>
     </div>
-    <script type="module" src="/arcade/assets/dice21-mp.js"></script>
-    <script src="/arcade/assets/dice21-start-gate.js" defer></script>
-    <script src="/arcade/assets/dice21-mobile-ui.js" defer></script>
-    <script src="/arcade/assets/dice21-view-pad.js" defer></script>
-    <script>
-      for (const el of document.querySelectorAll('.copyright-year')) {
-        el.textContent = String(new Date().getFullYear())
-      }
-    </script>
+    <script type="module" src="/dice-21/assets/dice21-mp.js"></script>
+    <script src="/dice-21/assets/dice21-start-gate.js" defer></script>
+    <script src="/dice-21/assets/dice21-mobile-ui.js" defer></script>
+    <script src="/dice-21/assets/dice21-view-pad.js" defer></script>
+    <script src="/dice-21/assets/dice21-copyright-year.js" defer></script>
   </body>
 </html>
