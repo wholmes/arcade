@@ -1,6 +1,6 @@
 /**
  * Toggle for experimental "action camera" — orbit shifts slightly with play (main bundle reads window.__d21CamSidePlay).
- * Persists to localStorage. Must load before the Dice 21 main chunk.
+ * Default **on**; turning off persists `0` in localStorage. Must load before the Dice 21 main chunk.
  *
  * Copyright © Whittfield Holmes. All rights reserved.
  */
@@ -9,9 +9,12 @@
 
   function read() {
     try {
-      return localStorage.getItem(KEY) === '1'
+      var v = localStorage.getItem(KEY)
+      if (v === '0') return false
+      if (v === '1') return true
+      return true
     } catch (_) {
-      return false
+      return true
     }
   }
 
