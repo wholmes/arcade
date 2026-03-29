@@ -2,7 +2,7 @@
 
 A fast-paced dice strategy game inspired by Blackjack — push your luck, outplay the house, and climb the stakes.
 
-👉 **Play now:** https://your-live-url.com
+👉 **Play now:** https://wholmes.github.io/arcade/
 
 ---
 
@@ -101,4 +101,4 @@ Built by **Whittfield Holmes**
 
 ## 🚀 Play Now
 
-👉 https://your-live-url.com
+👉 https://wholmes.github.io/arcade/
