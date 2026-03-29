@@ -1,6 +1,7 @@
 /**
- * Tap-to-start gate: preload audio assets, then enable "Tap to play".
- * Click calls window.d21EnterGame() — applies viewport/camera and starts the render loop (d21-ready from main chunk).
+ * Tap-to-start gate: preload gameplay-critical audio, then enable "Tap to play".
+ * DJ playlist files load afterward in the background (limited concurrency) so they
+ * do not block the gate or spike the network. Click calls window.d21EnterGame().
  *
  * Copyright © Whittfield Holmes. All rights reserved.
  */
@@ -16,29 +17,43 @@
     return new URL('../' + clean, document.baseURI).href
   }
 
-  function preloadAudio() {
+  /** Short SFX + room bed needed for first rolls / ambience — gate waits only for these. */
+  function preloadCriticalAudio() {
+    const paths = [
+      'audio/freesound_community-dice-shake-102631.wav',
+      'audio/freesound_community-casino-ambiance-19130.wav',
+      'audio/freesound_community-dry-dices-38579.wav',
+      'audio/freesound_community-dry-dices-solo-38579.wav',
+    ]
+    const urls = paths.map((p) => publicUrl(p))
+    return Promise.all(urls.map((u) => fetch(u, { cache: 'force-cache' }).catch(() => null)))
+  }
+
+  /**
+   * DJ tracks from manifest — runs after the button is enabled; does not block the gate.
+   * Fetches in small batches to avoid saturating the connection.
+   */
+  function preloadDjBackground() {
     const manifestUrl = publicUrl('audio/dj/manifest.json')
-    return fetch(manifestUrl)
+    const concurrency = 2
+
+    fetch(manifestUrl, { cache: 'force-cache' })
       .then((r) => (r.ok ? r.json() : { files: [] }))
       .then((j) => {
-        const urls = [manifestUrl]
         const files = Array.isArray(j.files) ? j.files : []
-        for (const f of files) {
-          urls.push(publicUrl('audio/dj/' + encodeURIComponent(f)))
+        const urls = files.map((f) => publicUrl('audio/dj/' + encodeURIComponent(f)))
+        if (urls.length === 0) return
+
+        let i = 0
+        function runBatch() {
+          const batch = urls.slice(i, i + concurrency)
+          i += batch.length
+          if (batch.length === 0) return
+          Promise.all(batch.map((u) => fetch(u, { cache: 'force-cache' }).catch(() => null))).then(runBatch)
         }
-        const extra = [
-          'audio/freesound_community-dice-shake-102631.wav',
-          'audio/freesound_community-casino-ambiance-19130.wav',
-          'audio/freesound_community-dry-dices-38579.wav',
-          'audio/freesound_community-dry-dices-solo-38579.wav',
-        ]
-        for (const p of extra) urls.push(publicUrl(p))
-        return urls
+        runBatch()
       })
-      .catch(() => [])
-      .then((urls) =>
-        Promise.all(urls.map((u) => fetch(u, { cache: 'force-cache' }).catch(() => null))),
-      )
+      .catch(() => {})
   }
 
   function enableButton() {
@@ -63,9 +78,15 @@
       pollId = null
     }
     if (statusEl) statusEl.textContent = 'Loading audio…'
-    preloadAudio()
-      .then(() => enableButton())
-      .catch(() => enableButton())
+    preloadCriticalAudio()
+      .then(() => {
+        enableButton()
+        preloadDjBackground()
+      })
+      .catch(() => {
+        enableButton()
+        preloadDjBackground()
+      })
   }
 
   function onReady() {

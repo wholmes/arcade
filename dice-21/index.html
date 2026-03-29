@@ -162,6 +162,18 @@
       .d21-top-banner-sub[hidden] {
         display: none !important;
       }
+      /* Active tournament series strip uses same top area; hide marquee so it isn’t stacked above the strip (z 11 vs 4). */
+      html.d21-tournament-active-banner-on {
+        --d21-top-banner-offset: 0px;
+      }
+      html.d21-tournament-active-banner-on .d21-tournament-active-banner {
+        z-index: 12;
+      }
+      @media (min-width: 641px) {
+        html.d21-tournament-active-banner-on .d21-top-banner {
+          display: none !important;
+        }
+      }
       /* ≤640px: hide fixed sign — it crowded zoom, Badges, and bottom bar; branding stays on desktop + start screen */
       @media (max-width: 640px) {
         :root {
@@ -424,7 +436,7 @@
           top: calc(max(10px, env(safe-area-inset-top)) + var(--d21-top-banner-offset, 56px));
           left: max(10px, env(safe-area-inset-left));
           width: max-content;
-          max-width: min(200px, calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 168px));
+          max-width: min(176px, calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 200px));
           z-index: 2;
         }
         html.is-mobile-ui .d21-badge-showcase.is-badge-collapsed::before {
@@ -484,7 +496,7 @@
           width: 100%;
           max-width: 100%;
           margin: 0 auto;
-          max-height: min(58vh, 480px);
+          max-height: min(48vh, 380px);
           /* Base .d21-badge-showcase-inner sets overflow-x:hidden — that clipped the grid on iPhone */
           overflow-x: visible;
           overflow-y: auto;
@@ -1023,10 +1035,19 @@
         align-self: start;
       }
       @media (max-width: 640px) {
+        /* Pin left/right — reserve ~132px on the right for zoom + Multiplayer (centered 92vw overlapped them) */
         .d21-tournament-active-banner {
-          width: min(calc(100vw - 20px), 440px);
+          left: max(8px, env(safe-area-inset-left));
+          right: calc(max(8px, env(safe-area-inset-right)) + 132px);
+          width: auto;
+          max-width: none;
+          transform: none;
           padding: 7px 9px 8px;
           top: max(8px, env(safe-area-inset-top));
+        }
+        /* Marquee is already off; drop strip below zoom + Multiplayer row so it isn’t hidden underneath */
+        html.d21-tournament-active-banner-on .d21-tournament-active-banner {
+          top: calc(max(8px, env(safe-area-inset-top)) + 48px);
         }
         #d21TournamentActiveTitle {
           font-size: 9px;

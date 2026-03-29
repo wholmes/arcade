@@ -196,10 +196,19 @@
     const wrap = document.getElementById('d21TournamentActive')
     const titleEl = document.getElementById('d21TournamentActiveTitle')
     const scoreEl = document.getElementById('d21TournamentActiveScore')
-    if (!wrap || !titleEl || !scoreEl) return
+    const root = document.documentElement
+    /** Hide marquee while series strip is visible — same top band; avoids z-index overlap (see index.html). */
+    function syncMarqueeVsStrip(stripVisible) {
+      root.classList.toggle('d21-tournament-active-banner-on', !!stripVisible)
+    }
+    if (!wrap || !titleEl || !scoreEl) {
+      syncMarqueeVsStrip(false)
+      return
+    }
     if (!run || isGuest()) {
       wrap.hidden = true
       wrap.setAttribute('aria-hidden', 'true')
+      syncMarqueeVsStrip(false)
       return
     }
     let title = ''
@@ -211,12 +220,14 @@
       title = row ? `${row.name} · ${row.prize}` : 'Table cup'
     } else {
       wrap.hidden = true
+      syncMarqueeVsStrip(false)
       return
     }
     titleEl.textContent = title
     scoreEl.textContent = `Series ${run.wins}–${run.losses} · first to ${winsToClinch()} wins (ties replay)`
     wrap.hidden = false
     wrap.setAttribute('aria-hidden', 'false')
+    syncMarqueeVsStrip(true)
   }
 
   function gateLifetime(lsH, lsW) {
