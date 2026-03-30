@@ -742,6 +742,74 @@
         margin-top: 8px;
         word-break: break-word;
       }
+      button.pd-game-picker-brand {
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        -webkit-appearance: none;
+        appearance: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      button.pd-game-picker-brand:focus-visible {
+        outline: 2px solid rgba(200, 170, 100, 0.55);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      .pd-game-picker-panel {
+        position: fixed;
+        z-index: 10020;
+        min-width: 196px;
+        padding: 8px 0;
+        border-radius: 10px;
+        background: linear-gradient(180deg, #1e2230 0%, #12151e 100%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          0 0 0 1px rgba(0, 0, 0, 0.35) inset,
+          0 14px 40px rgba(0, 0, 0, 0.55);
+        pointer-events: auto;
+      }
+      .pd-game-picker-panel[hidden] {
+        display: none !important;
+      }
+      .pd-game-picker-heading {
+        margin: 0;
+        padding: 4px 14px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #6a7488;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .pd-game-picker-link {
+        display: block;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #d8e0f0;
+        text-decoration: none;
+        transition: background 0.12s ease;
+      }
+      .pd-game-picker-link:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .pd-game-picker-link:focus-visible {
+        outline: 2px solid rgba(232, 200, 122, 0.55);
+        outline-offset: -2px;
+      }
+      .pd-game-picker-link.is-current {
+        color: #e8c87a;
+        background: rgba(232, 200, 122, 0.08);
+      }
       /* ——— Mobile & narrow tablets ——— */
       @media (max-width: 820px) {
         #layout {
@@ -815,15 +883,25 @@
     <script type="module" crossorigin src="/arcade/assets/main-C0mZDoeW.js"></script>
     <link rel="modulepreload" crossorigin href="/arcade/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/arcade/assets/audio-D0LHhIrN.js">
+    <script src="/arcade/assets/game-picker.js" defer></script>
   </head>
   <body>
     <div id="layout">
       <header id="topbar">
-        <div class="brand">
+        <button
+          type="button"
+          class="brand pd-game-picker-brand"
+          data-game-picker-panel="pdGamePicker"
+          id="pdGamePickerTrigger"
+          aria-expanded="false"
+          aria-haspopup="true"
+          aria-controls="pdGamePicker"
+          title="Open games menu"
+        >
           <h1>Poker Dice</h1>
           <p id="modeTagline" class="brand-tagline">Five dice · rolls · best hand</p>
           <p class="copyright-brand">© <span class="copyright-year"></span> Whittfield Holmes</p>
-        </div>
+        </button>
         <div id="stats">
           <span class="stat-pill">Round <strong id="roundNum">1</strong> / <strong id="maxRoundsNum">10</strong></span>
           <span class="stat-pill">Rolls <strong id="rollsLeft">3</strong></span>
@@ -843,6 +921,17 @@
           </button>
         </div>
       </header>
+      <div
+        id="pdGamePicker"
+        class="pd-game-picker-panel"
+        hidden
+        role="menu"
+        aria-label="Choose a game"
+      >
+        <p class="pd-game-picker-heading">Games</p>
+        <a href="../dice-21/index.html" class="pd-game-picker-link" target="_blank" rel="noopener noreferrer">Dice 21</a>
+        <a href="index.html" class="pd-game-picker-link is-current" target="_blank" rel="noopener noreferrer">Poker Dice</a>
+      </div>
       <div id="stage-spacer" aria-hidden="true"></div>
       <aside id="sidebar">
         <div id="modePanel">

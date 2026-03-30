@@ -55,6 +55,7 @@
         right: 0;
         z-index: 11;
         padding: max(6px, env(safe-area-inset-top)) 12px 0;
+        /* Let clicks hit the sign button; empty margin around it stays non-blocking */
         pointer-events: none;
         display: flex;
         justify-content: center;
@@ -161,6 +162,115 @@
       }
       .d21-top-banner-sub[hidden] {
         display: none !important;
+      }
+      .d21-top-banner-stack {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: min(92vw, 520px);
+        /* Banner uses pointer-events: none (clicks pass through to the table); that value inherits — override here */
+        pointer-events: auto;
+      }
+      button.d21-top-banner-inner {
+        margin: 0;
+        width: 100%;
+        font: inherit;
+        cursor: pointer;
+        -webkit-appearance: none;
+        appearance: none;
+        text-align: center;
+        border: none;
+        color: inherit;
+        -webkit-tap-highlight-color: transparent;
+        pointer-events: auto;
+      }
+      button.d21-top-banner-inner:focus-visible {
+        outline: 2px solid rgba(232, 200, 122, 0.55);
+        outline-offset: 3px;
+      }
+      .d21-game-picker-panel {
+        position: fixed;
+        z-index: 10020;
+        min-width: 196px;
+        padding: 8px 0;
+        border-radius: 10px;
+        background: linear-gradient(180deg, #1e2230 0%, #12151e 100%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          0 0 0 1px rgba(0, 0, 0, 0.35) inset,
+          0 14px 40px rgba(0, 0, 0, 0.55);
+        pointer-events: auto;
+      }
+      .d21-game-picker-panel[hidden] {
+        display: none !important;
+      }
+      .d21-game-picker-heading {
+        margin: 0;
+        padding: 4px 14px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #6a7488;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .d21-game-picker-link {
+        display: block;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #d8e0f0;
+        text-decoration: none;
+        transition: background 0.12s ease;
+      }
+      .d21-game-picker-link:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .d21-game-picker-link:focus-visible {
+        outline: 2px solid rgba(232, 200, 122, 0.55);
+        outline-offset: -2px;
+      }
+      .d21-game-picker-link.is-current {
+        color: #e8c87a;
+        background: rgba(232, 200, 122, 0.08);
+      }
+      .d21-game-picker-fab {
+        display: none;
+        position: fixed;
+        z-index: 10001;
+        top: max(10px, env(safe-area-inset-top));
+        left: max(10px, env(safe-area-inset-left));
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #e4e8f0;
+        background: rgba(14, 16, 24, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+        cursor: pointer;
+        pointer-events: auto;
+        -webkit-tap-highlight-color: transparent;
+      }
+      @media (min-width: 641px) {
+        .d21-game-picker-fab {
+          display: none !important;
+        }
+        /* Marquee hidden during tournament — keep Games reachable */
+        html.d21-tournament-active-banner-on .d21-game-picker-fab {
+          display: inline-flex !important;
+        }
+      }
+      @media (max-width: 640px) {
+        .d21-game-picker-fab {
+          display: inline-flex;
+        }
       }
       /* Active tournament series strip uses same top area; hide marquee so it isn’t stacked above the strip (z 11 vs 4). */
       html.d21-tournament-active-banner-on {
@@ -3036,6 +3146,7 @@
     <script src="/arcade/assets/dice21-rules.js"></script>
     <script src="/arcade/assets/dice21-badge-showcase.js"></script>
     <script src="/arcade/assets/dice21-top-banner.js" defer></script>
+    <script src="/arcade/assets/game-picker.js" defer></script>
     <script src="/arcade/assets/dice21-tournaments.js" defer></script>
     <script type="module" crossorigin src="/arcade/assets/dice21-DU7nhPGz.js?v=dice21-core-lt8"></script>
     <link rel="modulepreload" crossorigin href="/arcade/assets/modulepreload-polyfill-B5Qt9EMX.js">
@@ -3141,15 +3252,49 @@
       </footer>
     </div>
     <div id="app">
+      <button
+        type="button"
+        class="d21-game-picker-fab"
+        id="d21GamePickerFab"
+        data-game-picker-panel="d21GamePicker"
+        aria-expanded="false"
+        aria-haspopup="true"
+        aria-controls="d21GamePicker"
+        title="Games menu"
+      >
+        Games
+      </button>
       <div id="d21TopBanner" class="d21-top-banner" role="banner" aria-label="Game announcement">
-        <div class="d21-top-banner-inner">
-          <p class="d21-top-banner-sign-line">
-            <span class="d21-top-banner-name" id="d21TopBannerName">Dice</span>
-            <span class="d21-top-banner-sep" aria-hidden="true">◆</span>
-            <span class="d21-top-banner-game" id="d21TopBannerGame">Casino</span>
-          </p>
-          <p class="d21-top-banner-sub" id="d21TopBannerSub" hidden></p>
+        <div class="d21-top-banner-stack">
+          <button
+            type="button"
+            class="d21-top-banner-inner"
+            data-game-picker-panel="d21GamePicker"
+            id="d21GamePickerTrigger"
+            aria-expanded="false"
+            aria-haspopup="true"
+            aria-controls="d21GamePicker"
+            title="Open games menu"
+          >
+            <p class="d21-top-banner-sign-line">
+              <span class="d21-top-banner-name" id="d21TopBannerName">Dice</span>
+              <span class="d21-top-banner-sep" aria-hidden="true">◆</span>
+              <span class="d21-top-banner-game" id="d21TopBannerGame">Casino</span>
+            </p>
+            <p class="d21-top-banner-sub" id="d21TopBannerSub" hidden></p>
+          </button>
         </div>
+      </div>
+      <div
+        id="d21GamePicker"
+        class="d21-game-picker-panel"
+        hidden
+        role="menu"
+        aria-label="Choose a game"
+      >
+        <p class="d21-game-picker-heading">Games</p>
+        <a href="index.html" class="d21-game-picker-link is-current" target="_blank" rel="noopener noreferrer">Dice 21</a>
+        <a href="../poker-dice/index.html" class="d21-game-picker-link" target="_blank" rel="noopener noreferrer">Poker Dice</a>
       </div>
       <div
         class="d21-badge-showcase is-badge-collapsed"
