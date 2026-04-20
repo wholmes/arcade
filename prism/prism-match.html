@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>PRISM — Crystal Match</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="prism-match.css">
+</head>
+<body>
+
+<div id="bg"></div>
+<div id="bg-orbs" aria-hidden="true">
+  <div class="bg-orb o1"></div>
+  <div class="bg-orb o2"></div>
+  <div class="bg-orb o3"></div>
+</div>
+<div id="combo-toast" class="combo-toast" aria-live="polite"></div>
+<div id="hint-toast" class="hint-toast" role="status" aria-live="polite"></div>
+
+<!-- ── TITLE ─────────────────────────────────────────────── -->
+<div class="screen" id="title-screen">
+  <div class="logo">PRISM</div>
+  <div class="logo-sub">Crystal Match Puzzle</div>
+  <div class="gem-row" id="gem-preview-row"></div>
+  <div class="title-btn-row">
+    <button type="button" class="btn btn-primary" onclick="showLevelIntro()">CAMPAIGN</button>
+    <button type="button" class="btn btn-rush" onclick="PM.startRush()">⚡ RUSH</button>
+  </div>
+  <div class="title-btn-row">
+    <button type="button" class="btn btn-secondary" onclick="beginNewCampaign()">NEW GAME</button>
+    <button type="button" class="btn btn-secondary" onclick="showRules()">HOW TO PLAY</button>
+  </div>
+  <div class="gfx-toggle-row" id="gfx-toggle-row">
+    <span class="gfx-toggle-label">Visuals</span>
+    <div class="gfx-seg" role="group" aria-label="Graphics quality">
+      <button type="button" class="gfx-seg-btn" data-gfx="auto" aria-pressed="false">Auto</button>
+      <button type="button" class="gfx-seg-btn" data-gfx="performance" aria-pressed="false">Performance</button>
+      <button type="button" class="gfx-seg-btn" data-gfx="quality" aria-pressed="false">Quality</button>
+    </div>
+    <p class="gfx-toggle-hint hidden" id="gfx-toggle-hint" role="note"></p>
+  </div>
+</div>
+
+<!-- ── LEVEL INTRO ────────────────────────────────────────── -->
+<div class="screen hidden" id="intro-screen">
+  <div class="intro-badge">LEVEL</div>
+  <div class="intro-num" id="intro-num">1</div>
+  <div class="intro-name" id="intro-name">Glowshard Grotto</div>
+  <div class="intro-sub" id="intro-sub"></div>
+  <div class="intro-card" id="intro-obj-list"></div>
+  <div class="intro-moves-note" id="intro-moves-note">30 MOVES</div>
+  <button class="btn btn-primary" onclick="startLevel()">BEGIN</button>
+</div>
+
+<!-- ── RULES PANEL (overlay) ───────────────────────────────── -->
+<div id="rules-panel" class="rules-panel hidden" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+  <div class="rules-panel-backdrop" onclick="hideRules()"></div>
+  <div class="rules-panel-sheet">
+    <div class="rules-panel-header">
+      <h2 id="rules-title" class="rules-panel-title">How to play</h2>
+      <button type="button" class="rules-close" onclick="hideRules()" aria-label="Close">×</button>
+    </div>
+    <div class="rules-panel-body">
+      <section class="rules-section">
+        <h3>Goal</h3>
+        <p>Each level shows objectives under the score (for example, clear enough gems of a color or destroy crates). Complete every objective before you run out of moves.</p>
+      </section>
+      <section class="rules-section">
+        <h3>Swapping</h3>
+        <p>Tap a crystal, then tap an <strong>adjacent</strong> crystal (up, down, left, or right) to swap them. Diagonal swaps are not allowed.</p>
+        <p>Or <strong>drag</strong> from one crystal toward a neighbor: the direction of your drag picks which side to swap with (orthogonal only).</p>
+        <p>A swap must create a match of <strong>three or more</strong> of the same color in a row or column. If it would not, the pieces snap back and you keep your move.</p>
+        <p>Tap the same piece again to deselect. Tap an empty slot to clear your selection.</p>
+      </section>
+      <section class="rules-section">
+        <h3>Matches &amp; scoring</h3>
+        <p>Matched crystals are removed. New ones fall in from the top. Chain reactions count as <strong>combos</strong> for bonus score.</p>
+      </section>
+      <section class="rules-section">
+        <h3>Power crystals</h3>
+        <p><strong>Line burst</strong> — match four in a row or column. Swap or activate it to clear that entire row or column (depending on how you swapped).</p>
+        <p><strong>Prism</strong> — match five or more in a line. Clears all crystals of that color on the board.</p>
+        <p><strong>Nova</strong> — matches that form an L or T shape create a blast that clears a wider area around them.</p>
+      </section>
+      <section class="rules-section">
+        <h3>Crates &amp; blocked tiles</h3>
+        <p><strong>Crates</strong> are cleared by making matches next to them (each hit removes one layer). Some levels require destroying all crates.</p>
+        <p><strong>Blocked</strong> tiles are gaps in the board; crystals cannot be placed there.</p>
+      </section>
+      <section class="rules-section">
+        <h3>Stars</h3>
+        <p>When you clear a level, stars reflect how many moves you had left — more moves remaining means a better rating.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ── GAME ───────────────────────────────────────────────── -->
+<div class="screen hidden" id="game-screen">
+  <button type="button" class="btn btn-secondary game-hint-btn" onclick="requestHint()" aria-label="Hint" title="Keyboard: H">HINT</button>
+  <button type="button" class="btn btn-secondary game-rules-btn" onclick="showRules()">RULES</button>
+  <button type="button" class="btn btn-secondary game-menu-btn hidden" id="game-menu-btn" onclick="showScreen('title-screen')">QUIT</button>
+  <div id="hud">
+    <div class="hud-block">
+      <div class="hud-label">Level</div>
+      <div class="hud-val lv" id="hud-lv">1</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Score</div>
+      <div class="hud-val sc" id="hud-sc">0</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Moves</div>
+      <div class="hud-val mv" id="hud-mv">30</div>
+    </div>
+  </div>
+  <div id="obj-strip"></div>
+  <div id="board-wrap">
+    <div id="board-prism">
+      <div id="board-tilt">
+        <div id="rain-preview" class="rain-preview" aria-label="Next rain" aria-hidden="true"></div>
+        <div id="match-beam" class="match-beam" aria-hidden="true"></div>
+        <div id="board"></div>
+      </div>
+      <div id="col-warnings" aria-hidden="true">
+        <div class="col-warn-strip" data-col="0"></div>
+        <div class="col-warn-strip" data-col="1"></div>
+        <div class="col-warn-strip" data-col="2"></div>
+        <div class="col-warn-strip" data-col="3"></div>
+        <div class="col-warn-strip" data-col="4"></div>
+        <div class="col-warn-strip" data-col="5"></div>
+        <div class="col-warn-strip" data-col="6"></div>
+        <div class="col-warn-strip" data-col="7"></div>
+      </div>
+    </div>
+    <canvas id="pcanvas" aria-hidden="true"></canvas>
+  </div>
+</div>
+
+<!-- ── LEVEL COMPLETE ─────────────────────────────────────── -->
+<div class="screen hidden" id="complete-screen">
+  <div class="result-title win">LEVEL CLEAR</div>
+  <div class="stars-row" id="stars-row">⭐⭐⭐</div>
+  <div class="result-score-label">SCORE</div>
+  <div class="result-score-val" id="win-score">0</div>
+  <div class="btn-row" id="complete-btn-row">
+    <button type="button" class="btn btn-primary" id="next-btn" onclick="nextLevel()">NEXT LEVEL</button>
+    <button type="button" class="btn btn-secondary" id="complete-menu-btn" onclick="showScreen('title-screen')">MENU</button>
+  </div>
+</div>
+
+<!-- ── GAME OVER ──────────────────────────────────────────── -->
+<div class="screen hidden" id="gameover-screen">
+  <div class="result-title lose">OUT OF MOVES</div>
+  <div class="result-score-label">SCORE</div>
+  <div class="result-score-val" id="over-score">0</div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="retryLevel()">RETRY</button>
+    <button class="btn btn-primary"   onclick="showScreen('title-screen')">MENU</button>
+  </div>
+</div>
+
+<!-- ── RUSH OVER ───────────────────────────────────────────── -->
+<div class="screen hidden" id="rush-over-screen">
+  <div class="result-title lose">BURIED</div>
+  <div class="rush-new-hs" id="rush-new-hs">NEW BEST!</div>
+  <div class="rush-over-stats">
+    <div class="rush-stat-block">
+      <div class="rush-stat-label">SCORE</div>
+      <div class="rush-stat-val amber" id="rush-over-score">0</div>
+    </div>
+    <div class="rush-stat-block">
+      <div class="rush-stat-label">BEST</div>
+      <div class="rush-stat-val dim" id="rush-over-hs">0</div>
+    </div>
+    <div class="rush-stat-block">
+      <div class="rush-stat-label">TIME</div>
+      <div class="rush-stat-val" id="rush-over-time">0:00</div>
+    </div>
+    <div class="rush-stat-block">
+      <div class="rush-stat-label">BEST TIME</div>
+      <div class="rush-stat-val dim" id="rush-over-best-time">0:00</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-rush" onclick="PM.startRush()">⚡ PLAY AGAIN</button>
+    <button class="btn btn-secondary" onclick="showScreen('title-screen')">MENU</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous"></script>
+<script src="js/constants.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/state.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/dom-utils.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/game-loop.js"></script>
+<script src="js/render.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/rush.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

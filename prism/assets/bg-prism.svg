@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0618"/>
+      <stop offset="45%" style="stop-color:#0c1028"/>
+      <stop offset="100%" style="stop-color:#060814"/>
+    </linearGradient>
+    <linearGradient id="crystal1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c070e8;stop-opacity:0.22"/>
+      <stop offset="100%" style="stop-color:#2080ff;stop-opacity:0.08"/>
+    </linearGradient>
+    <linearGradient id="crystal2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff3854;stop-opacity:0.12"/>
+      <stop offset="100%" style="stop-color:#00e676;stop-opacity:0.06"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" style="stop-color:#3040a0;stop-opacity:0.35"/>
+      <stop offset="70%" style="stop-color:#0a0820;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <ellipse cx="960" cy="420" rx="900" ry="520" fill="url(#glow)"/>
+  <!-- Large crystal facets (cavern / prism chamber) -->
+  <g opacity="0.78">
+    <polygon points="0,0 520,0 380,420 0,280" fill="url(#crystal1)"/>
+    <polygon points="1920,0 1400,0 1520,380 1920,220" fill="url(#crystal1)"/>
+    <polygon points="0,1080 0,620 420,1080" fill="url(#crystal2)"/>
+    <polygon points="1920,1080 1920,680 1480,1080" fill="url(#crystal2)"/>
+    <polygon points="640,0 1280,0 1080,480 840,380" fill="url(#crystal1)"/>
+    <polygon points="200,400 480,200 720,520 440,760" fill="#c070e8" opacity="0.08"/>
+    <polygon points="1200,320 1580,180 1720,520 1340,680" fill="#2080ff" opacity="0.07"/>
+  </g>
+  <g stroke="rgba(255,255,255,0.06)" stroke-width="1" fill="none" opacity="0.9">
+    <path d="M0 520 L320 380 L180 720 Z"/>
+    <path d="M1920 480 L1600 340 L1740 680 Z"/>
+    <path d="M960 200 L1200 480 L720 480 Z"/>
+  </g>
+  <g fill="rgba(255,255,255,0.03)">
+    <circle cx="200" cy="180" r="2"/><circle cx="1680" cy="220" r="1.5"/>
+    <circle cx="1420" cy="140" r="2"/><circle cx="320" cy="800" r="2"/>
+    <circle cx="960" cy="100" r="2.5"/><circle cx="780" cy="260" r="1.5"/>
+  </g>
+</svg>
