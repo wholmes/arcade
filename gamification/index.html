@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<!-- 10 Speed Studios — Copyright © Whittfield Holmes. All rights reserved. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Whittfield Holmes" />
+  <title>Gamification in Marketing · 10 Speed Studios</title>
+  <meta name="description" content="Why the sharpest marketers are thinking like game designers — and what separates the campaigns that work from the ones that waste the budget." />
+  <link rel="icon" href="/arcade/assets/favicon-D8NRme3X.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #07090f;
+      --bg-2:         #0c0f1a;
+      --bg-3:         #131624;
+      --text:         #dde4f0;
+      --text-muted:   #6e7a8e;
+      --text-dim:     #9aa3b2;
+      --gold:         #c8a96e;
+      --gold-bright:  #e2c47a;
+      --gold-dim:     rgba(200, 169, 110, 0.13);
+      --gold-border:  rgba(200, 169, 110, 0.26);
+      --green:        #3ec98a;
+      --font-display: 'Bebas Neue', ui-sans-serif, system-ui, sans-serif;
+      --font-body:    'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      --prose:        42rem;
+      --wide:         72rem;
+      --gutter:       clamp(1.25rem, 5vw, 3.5rem);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ───────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem var(--gutter);
+      background: rgba(7, 9, 15, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+    }
+
+    .nav-wordmark {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      letter-spacing: 0.1em;
+      color: var(--gold-bright);
+      text-decoration: none;
+    }
+    .nav-wordmark:hover { color: var(--text); }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+      transition: color 0.18s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a[aria-current="page"] { color: var(--gold-bright); }
+
+    /* ── Layout helpers ────────────────────────────── */
+    .article-body { padding-top: 5.5rem; }
+
+    .container {
+      max-width: var(--wide);
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+    }
+
+    .prose {
+      max-width: var(--prose);
+      margin-inline: auto;
+    }
+
+    /* ── Article hero ──────────────────────────────── */
+    .article-hero {
+      padding: clamp(3rem, 8vw, 6rem) 0 clamp(2rem, 5vw, 3.5rem);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .article-hero .container { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .article-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .article-eyebrow::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--gold-border);
+    }
+
+    .article-headline {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      letter-spacing: 0.03em;
+      line-height: 1.0;
+      color: var(--text);
+      max-width: 20ch;
+    }
+
+    .article-headline em {
+      font-style: normal;
+      color: var(--gold-bright);
+    }
+
+    .article-deck {
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      color: var(--text-dim);
+      font-weight: 300;
+      line-height: 1.65;
+      max-width: 52ch;
+    }
+
+    .article-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Stats band ────────────────────────────────── */
+    .stats-band {
+      background: var(--bg-2);
+      border-top: 1px solid rgba(255,255,255,0.045);
+      border-bottom: 1px solid rgba(255,255,255,0.045);
+      padding: clamp(2rem, 4vw, 3rem) 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    .stat-item {
+      padding: 0 clamp(1rem, 3vw, 2.5rem);
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .stat-item:first-child { padding-left: 0; }
+    .stat-item:last-child  { border-right: none; }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: 0.04em;
+      color: var(--gold-bright);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    /* ── Article sections ──────────────────────────── */
+    .article-section {
+      padding: clamp(3rem, 6vw, 5rem) 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: 0.04em;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+
+    .section-heading .accent { color: var(--gold-bright); }
+
+    .article-p {
+      font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+      color: var(--text-dim);
+      font-weight: 300;
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+    }
+
+    .article-p:last-child { margin-bottom: 0; }
+
+    .article-p strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      margin: 2.5rem 0;
+      padding: 1.75rem 2rem 1.75rem 1.75rem;
+      border-left: 3px solid var(--gold-border);
+      background: var(--bg-2);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .pull-quote p {
+      font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* ── Mechanics list ────────────────────────────── */
+    .mechanics-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 2rem;
+      border: 1px solid rgba(255,255,255,0.055);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .mechanic-item {
+      display: grid;
+      grid-template-columns: 3.5rem 1fr;
+      gap: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.055);
+    }
+    .mechanic-item:last-child { border-bottom: none; }
+
+    .mechanic-num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-2);
+      border-right: 1px solid rgba(255,255,255,0.055);
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      letter-spacing: 0.04em;
+      color: var(--gold);
+    }
+
+    .mechanic-body {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .mechanic-name {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+
+    .mechanic-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.65;
+    }
+
+    /* ── Use case cards ────────────────────────────── */
+    .use-cases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+      gap: 1px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.055);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+
+    .use-case-card {
+      background: var(--bg);
+      padding: 1.5rem;
+      transition: background 0.18s;
+    }
+    .use-case-card:hover { background: var(--bg-2); }
+
+    .use-case-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .use-case-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .use-case-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.65;
+    }
+
+    /* ── Failure modes ─────────────────────────────── */
+    .failure-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .failure-item {
+      padding-left: 1.5rem;
+      border-left: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .failure-item:first-child { border-left-color: rgba(239, 68, 68, 0.4); }
+    .failure-item:nth-child(2) { border-left-color: rgba(249, 115, 22, 0.4); }
+    .failure-item:last-child   { border-left-color: rgba(234, 179, 8, 0.4); }
+
+    .failure-name {
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .failure-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.65;
+    }
+
+    /* ── CTA ───────────────────────────────────────── */
+    .article-cta {
+      padding: clamp(3.5rem, 8vw, 6rem) 0;
+      text-align: center;
+    }
+
+    .cta-inner {
+      max-width: 38rem;
+      margin-inline: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .cta-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .cta-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: 0.04em;
+      line-height: 1.05;
+      color: var(--text);
+    }
+
+    .cta-sub {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .btn-gold {
+      padding: 0.7rem 2.2rem;
+      background: var(--gold);
+      color: #07090f;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      border: none;
+      border-radius: 100px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.18s, transform 0.14s;
+    }
+    .btn-gold:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-ghost {
+      padding: 0.7rem 2.2rem;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 100px;
+      text-decoration: none;
+      transition: color 0.18s, border-color 0.18s;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.28); }
+
+    /* ── Footer ────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 2.5rem 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 800px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-item:nth-child(2) { border-right: none; }
+      .stat-item:nth-child(3) { padding-left: 0; border-right: 1px solid rgba(255,255,255,0.06); }
+      .stat-item:nth-child(odd) { padding-left: 0; }
+      .stat-item { padding-top: 1.25rem; padding-bottom: 0; }
+      .stat-item:nth-child(n+3) { padding-top: 1.5rem; }
+    }
+
+    @media (max-width: 520px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-item { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 1.25rem 0; }
+      .stat-item:last-child { border-bottom: none; }
+      .nav-links { gap: 1.2rem; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ── Game Theory flip cards ────────────────────────────── */
+    .theory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(10px, 1.5vw, 16px);
+      margin-top: 2rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .theory-card {
+      aspect-ratio: 3 / 4;
+      cursor: pointer;
+      perspective: 700px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .tc-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.42s cubic-bezier(0.4, 0.2, 0.2, 1);
+      border-radius: 8px;
+    }
+
+    .theory-card.tc-flipped .tc-inner { transform: rotateY(180deg); }
+
+    .tc-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .tc-back {
+      background: linear-gradient(145deg, #0f1628 0%, #08101e 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .tc-back::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient( 45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 11px),
+        repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 11px);
+    }
+
+    .tc-back::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 3px;
+      pointer-events: none;
+    }
+
+    .tc-back-mark {
+      display: block;
+      width: 32%;
+      aspect-ratio: 1;
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      transform: rotate(45deg);
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 18px rgba(200, 169, 110, 0.08);
+    }
+
+    .tc-front {
+      transform: rotateY(180deg);
+      background: var(--bg-2);
+      border: 1px solid var(--cc-border, rgba(255,255,255,0.08));
+      display: flex;
+      flex-direction: column;
+      padding: clamp(0.9rem, 2vw, 1.4rem);
+      overflow: hidden;
+    }
+
+    .tc-front::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, var(--cc, rgba(255,255,255,0.1)), transparent 65%);
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .tc-num {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      color: var(--cc, var(--gold));
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tc-name {
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 2.2vw, 1.4rem);
+      letter-spacing: 0.06em;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tc-desc {
+      font-size: clamp(0.72rem, 1.2vw, 0.85rem);
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .theory-counter {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      min-height: 1.2em;
+    }
+
+    .theory-counter strong { color: var(--gold-bright); }
+
+    .theory-reset {
+      display: block;
+      margin: 1.25rem auto 0;
+      padding: 0.5rem 1.75rem;
+      background: none;
+      border: 1px solid var(--gold-border);
+      border-radius: 100px;
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      letter-spacing: 0.14em;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+    }
+
+    .theory-reset:hover { background: var(--gold-dim); color: var(--gold-bright); }
+
+    @media (max-width: 600px) {
+      .theory-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav" role="banner">
+    <a href="/arcade/" class="nav-wordmark" aria-label="10 Speed Studios home">10 Speed Studios</a>
+    <ul class="nav-links" role="list">
+      <li><a href="/arcade/#games">Games</a></li>
+      <li><a href="/arcade/gamification/" aria-current="page">Gamification</a></li>
+      <li><a href="/arcade/#studio">Studio</a></li>
+      <li><a href="/arcade/privacy-policy/">Privacy</a></li>
+    </ul>
+  </nav>
+
+  <main class="article-body">
+
+    <!-- ── Hero ──────────────────────────────────────── -->
+    <header class="article-hero">
+      <div class="container">
+        <p class="article-eyebrow">10 Speed Studios · Perspective</p>
+        <h1 class="article-headline">
+          Games Don't Ask for Attention.<br>
+          They <em>Earn</em> It.
+        </h1>
+        <p class="article-deck">
+          Why the sharpest marketers are thinking like game designers —
+          and what separates the campaigns that work from the ones that waste the budget.
+        </p>
+        <p class="article-meta">By 10 Speed Studios</p>
+      </div>
+    </header>
+
+    <!-- ── Stats ─────────────────────────────────────── -->
+    <div class="stats-band" role="region" aria-label="Key statistics">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number">4×</div>
+            <div class="stat-label">longer time-on-site for gamified brand experiences vs. static content</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">3×</div>
+            <div class="stat-label">higher conversion rate when a playable mechanic is paired with an offer</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">89%</div>
+            <div class="stat-label">of employees say game-based tools make them more productive at work</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">$47B</div>
+            <div class="stat-label">projected global gamification market by 2030, up from $15B in 2024</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Section 1: The problem ───────────────────── -->
+    <section class="article-section" aria-labelledby="s1-heading">
+      <div class="container">
+        <div class="prose">
+          <p class="section-label">The Problem</p>
+          <h2 class="section-heading" id="s1-heading">Marketing Has Always Borrowed Attention.<br><span class="accent">Games Earn It.</span></h2>
+
+          <p class="article-p">
+            Every banner ad, pre-roll, and sponsored post is borrowing attention. The audience
+            didn't choose to be there. They're tolerating the interruption before getting back
+            to whatever they actually cared about.
+          </p>
+
+          <p class="article-p">
+            Games are different. Nobody tolerates a game. They choose it, return to it, compete
+            inside it, and recruit their friends. The mechanic doesn't interrupt the experience —
+            it <strong>is</strong> the experience.
+          </p>
+
+          <div class="pull-quote">
+            <p>"The best game mechanic and the best campaign idea are solving the same
+            problem: they have to make the audience want to keep going."</p>
+          </div>
+
+          <p class="article-p">
+            That's the whole opportunity. Design marketing that people <em>want</em> to spend time
+            inside, and you stop competing for fractional seconds of attention. You start building
+            sessions, return visits, and word-of-mouth — assets no ad buy can manufacture.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 2: What it actually means ─────────── -->
+    <section class="article-section" aria-labelledby="s2-heading">
+      <div class="container">
+        <div class="prose">
+          <p class="section-label">The Definition</p>
+          <h2 class="section-heading" id="s2-heading">What Gamification<br><span class="accent">Actually Means</span></h2>
+
+          <p class="article-p">
+            The word gets misused constantly. Calling your loyalty points "coins" isn't
+            gamification. A PDF with checkboxes isn't a challenge system. Gamification means
+            applying the design principles that make games compelling — <strong>progress, challenge,
+            reward, competition, agency</strong> — to interactions that have a business goal.
+          </p>
+
+          <p class="article-p">
+            Done well, it turns passive audiences into active participants. Here are the five
+            mechanics that actually drive that shift:
+          </p>
+        </div>
+
+        <ol class="mechanics-list" role="list">
+          <li class="mechanic-item">
+            <div class="mechanic-num" aria-hidden="true">01</div>
+            <div class="mechanic-body">
+              <p class="mechanic-name">Progress</p>
+              <p class="mechanic-desc">Humans are wired to complete things. A progress bar, streak counter, or level system — any visible signal showing how far someone has come and how close they are to the next milestone — dramatically increases follow-through. Completion rates spike. Time-on-site extends. People come back tomorrow because they have something to continue.</p>
+            </div>
+          </li>
+          <li class="mechanic-item">
+            <div class="mechanic-num" aria-hidden="true">02</div>
+            <div class="mechanic-body">
+              <p class="mechanic-name">Challenge</p>
+              <p class="mechanic-desc">Games live or die on difficulty calibration. Too easy and people check out. Too hard and they quit. The sweet spot — where the challenge is just slightly beyond your current ability — is what psychologist Mihaly Csikszentmihalyi called flow. Design your brand experience to produce that state and you've built something rare: marketing people are focused on.</p>
+            </div>
+          </li>
+          <li class="mechanic-item">
+            <div class="mechanic-num" aria-hidden="true">03</div>
+            <div class="mechanic-body">
+              <p class="mechanic-name">Variable Reward</p>
+              <p class="mechanic-desc">Skinner figured this out with pigeons in the 1950s. Variable reward schedules — where the reward is sometimes big, sometimes small, always uncertain — are more motivating than predictable ones. It's why scratch cards outsell gift cards. Apply variable reward to your promotions and the engagement numbers change overnight.</p>
+            </div>
+          </li>
+          <li class="mechanic-item">
+            <div class="mechanic-num" aria-hidden="true">04</div>
+            <div class="mechanic-body">
+              <p class="mechanic-name">Social Competition</p>
+              <p class="mechanic-desc">Leaderboards activate a deep human drive: status relative to others. They work in workplace programs, live events, and consumer promotions alike. The key is the visible rank — knowing exactly where you stand and seeing a clear path to move up. That combination keeps people returning long after a flat incentive would have lost them.</p>
+            </div>
+          </li>
+          <li class="mechanic-item">
+            <div class="mechanic-num" aria-hidden="true">05</div>
+            <div class="mechanic-body">
+              <p class="mechanic-name">Agency</p>
+              <p class="mechanic-desc">Choice matters even when the outcomes are the same. Let your audience make decisions — pick a path, choose a character, set a strategy — and they become invested in the result in a way they never would be if you just pushed content at them. Agency converts a viewer into a player.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ── Section 3: Where it works ─────────────────── -->
+    <section class="article-section" aria-labelledby="s3-heading">
+      <div class="container">
+        <div class="prose">
+          <p class="section-label">Applications</p>
+          <h2 class="section-heading" id="s3-heading">Where It Works<br><span class="accent">Best</span></h2>
+          <p class="article-p">
+            Gamification isn't a single tactic — it's a lens. Here are the five contexts where
+            it consistently delivers the clearest return:
+          </p>
+        </div>
+
+        <div class="use-cases-grid">
+          <div class="use-case-card">
+            <span class="use-case-icon" aria-hidden="true">🎯</span>
+            <p class="use-case-name">Promotions</p>
+            <p class="use-case-desc">Replace sweepstakes entries and static discount codes with a playable experience. Dwell time increases, data capture improves, and the mechanic itself becomes the headline — earning media that a standard promotion never could.</p>
+          </div>
+          <div class="use-case-card">
+            <span class="use-case-icon" aria-hidden="true">📣</span>
+            <p class="use-case-name">Marketing Campaigns</p>
+            <p class="use-case-desc">A brand game embedded in a campaign can drive more earned media than the campaign itself. Players share scores, challenge friends, and return for one more attempt. The game loop keeps the campaign alive long after the media budget runs out.</p>
+          </div>
+          <div class="use-case-card">
+            <span class="use-case-icon" aria-hidden="true">🏢</span>
+            <p class="use-case-name">Employee Engagement</p>
+            <p class="use-case-desc">Training modules, onboarding flows, and compliance programs are exactly as boring as they sound. A game layer changes that — not by making the content easier, but by giving people a genuine reason to try again, compete, and improve.</p>
+          </div>
+          <div class="use-case-card">
+            <span class="use-case-icon" aria-hidden="true">🔁</span>
+            <p class="use-case-name">Customer Loyalty</p>
+            <p class="use-case-desc">Points expiration anxiety is a loyalty program's worst feature. Games replace that low-grade dread with genuine anticipation. When redeeming rewards feels like winning rather than cashing out, the program becomes a destination instead of a chore.</p>
+          </div>
+          <div class="use-case-card">
+            <span class="use-case-icon" aria-hidden="true">🎪</span>
+            <p class="use-case-name">Live Events</p>
+            <p class="use-case-desc">Games are the best icebreaker ever invented. Conference games, audience participation moments, and leaderboard competitions drive floor traffic, social sharing, and the kind of memory formation that outlasts any keynote speaker.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 4: What kills it ──────────────────── -->
+    <section class="article-section" aria-labelledby="s4-heading">
+      <div class="container">
+        <div class="prose">
+          <p class="section-label">The Hard Part</p>
+          <h2 class="section-heading" id="s4-heading">What Kills<br><span class="accent">Most Attempts</span></h2>
+
+          <p class="article-p">
+            Most gamification failures share three causes. Knowing them upfront is the difference
+            between a campaign that compounds and one that lands flat.
+          </p>
+
+          <ul class="failure-list" role="list">
+            <li class="failure-item">
+              <p class="failure-name">It's not actually a game.</p>
+              <p class="failure-desc">Renaming your loyalty points "gems" isn't gamification. A PDF with checkboxes isn't a challenge system. If there's no moment of genuine play — no tension, no uncertainty, no satisfaction — you've just rebranded something boring. Audiences can tell.</p>
+            </li>
+            <li class="failure-item">
+              <p class="failure-name">The game isn't any fun.</p>
+              <p class="failure-desc">A poor game with a great prize is still a poor game. People will attempt it once for the reward and never return. Great games attract repeat play on their own. Prizes are the accelerant, not the engine. If the core loop isn't enjoyable, no incentive will save it.</p>
+            </li>
+            <li class="failure-item">
+              <p class="failure-name">It's disconnected from the brand.</p>
+              <p class="failure-desc">A game that could belong to any company does nothing for brand memory. The mechanic, the visual design, the tone, the story — all of it needs to be unmistakably yours. Otherwise you're building entertainment for a competitor's benefit.</p>
+            </li>
+          </ul>
+
+          <div class="pull-quote" style="margin-top: 2.5rem;">
+            <p>"If the core loop isn't enjoyable, no prize will save it. Design the game first.
+            Build the incentive structure second."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Simple Game Theory ───────────────────────────── -->
+    <section class="article-section" aria-labelledby="theory-heading">
+      <div class="container">
+        <p class="section-label">Design Principles</p>
+        <h2 class="section-heading" id="theory-heading">Simple <span class="accent">Game Theory</span></h2>
+        <p class="article-p">Every great game is built on a handful of ideas. Flip the cards to find them.</p>
+
+        <div class="theory-grid" role="list">
+
+          <div class="theory-card" role="listitem" tabindex="0" aria-label="Flip card: Core Loop">
+            <div class="tc-inner">
+              <div class="tc-face tc-back"><span class="tc-back-mark"></span></div>
+              <div class="tc-face tc-front" style="--cc:#ef4444;--cc-border:rgba(239,68,68,0.28)">
+                <span class="tc-num">01</span>
+                <h3 class="tc-name">Core Loop</h3>
+                <p class="tc-desc">Action → reward → repeat. Break this cycle and you break the game.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="theory-card" role="listitem" tabindex="0" aria-label="Flip card: Variable Reward">
+            <div class="tc-inner">
+              <div class="tc-face tc-back"><span class="tc-back-mark"></span></div>
+              <div class="tc-face tc-front" style="--cc:#f97316;--cc-border:rgba(249,115,22,0.28)">
+                <span class="tc-num">02</span>
+                <h3 class="tc-name">Variable Reward</h3>
+                <p class="tc-desc">Unpredictable payoffs engage more than guaranteed ones. The slot machine principle.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="theory-card" role="listitem" tabindex="0" aria-label="Flip card: Flow State">
+            <div class="tc-inner">
+              <div class="tc-face tc-back"><span class="tc-back-mark"></span></div>
+              <div class="tc-face tc-front" style="--cc:#eab308;--cc-border:rgba(234,179,8,0.28)">
+                <span class="tc-num">03</span>
+                <h3 class="tc-name">Flow State</h3>
+                <p class="tc-desc">Between boredom and frustration is a zone of complete focus. Good games live there.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="theory-card" role="listitem" tabindex="0" aria-label="Flip card: Progress">
+            <div class="tc-inner">
+              <div class="tc-face tc-back"><span class="tc-back-mark"></span></div>
+              <div class="tc-face tc-front" style="--cc:#22c55e;--cc-border:rgba(34,197,94,0.28)">
+                <span class="tc-num">04</span>
+                <h3 class="tc-name">Progress</h3>
+                <p class="tc-desc">Visible advancement — bars, levels, streaks — compels completion.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="theory-card" role="listitem" tabindex="0" aria-label="Flip card: Feedback">
+            <div class="tc-inner">
+              <div class="tc-face tc-back"><span class="tc-back-mark"></span></div>
+              <div class="tc-face tc-front" style="--cc:#3b82f6;--cc-border:rgba(59,130,246,0.28)">
+                <span class="tc-num">05</span>
+                <h3 class="tc-name">Feedback</h3>
+                <p class="tc-desc">Instant signals tell players if their choices worked. Clarity creates confidence.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="theory-card" role="listitem" tabindex="0" aria-label="Flip card: Social Play">
+            <div class="tc-inner">
+              <div class="tc-face tc-back"><span class="tc-back-mark"></span></div>
+              <div class="tc-face tc-front" style="--cc:#a855f7;--cc-border:rgba(168,85,247,0.28)">
+                <span class="tc-num">06</span>
+                <h3 class="tc-name">Social Play</h3>
+                <p class="tc-desc">Competition and shared goals multiply individual motivation.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="theory-card" role="listitem" tabindex="0" aria-label="Flip card: Agency">
+            <div class="tc-inner">
+              <div class="tc-face tc-back"><span class="tc-back-mark"></span></div>
+              <div class="tc-face tc-front" style="--cc:#ec4899;--cc-border:rgba(236,72,153,0.28)">
+                <span class="tc-num">07</span>
+                <h3 class="tc-name">Agency</h3>
+                <p class="tc-desc">Real choices make players invested in outcomes. The illusion of control still works.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="theory-card" role="listitem" tabindex="0" aria-label="Flip card: Loss Aversion">
+            <div class="tc-inner">
+              <div class="tc-face tc-back"><span class="tc-back-mark"></span></div>
+              <div class="tc-face tc-front" style="--cc:#06b6d4;--cc-border:rgba(6,182,212,0.28)">
+                <span class="tc-num">08</span>
+                <h3 class="tc-name">Loss Aversion</h3>
+                <p class="tc-desc">Fear of losing what you have motivates more than the prospect of equal gain.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <p id="theoryCounter" class="theory-counter"></p>
+        <button id="theoryReset" class="theory-reset" hidden>Reset</button>
+      </div>
+    </section>
+
+    <!-- ── CTA ────────────────────────────────────────── -->
+    <section class="article-cta" aria-labelledby="cta-heading">
+      <div class="container">
+        <div class="cta-inner">
+          <p class="cta-eyebrow">10 Speed Studios</p>
+          <h2 class="cta-heading" id="cta-heading">We Build the Games.<br>You Run the Campaign.</h2>
+          <p class="cta-sub">
+            Custom browser games for promotions, marketing, employee engagement,
+            customer loyalty, and live events — playable in any tab, on any device,
+            no install required.
+          </p>
+          <div class="cta-actions">
+            <a href="/arcade/" class="btn-gold">See our games</a>
+            <a href="/arcade/#for" class="btn-ghost">Built for business →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <p class="footer-copy">© <span class="copyright-year"></span> 10 Speed Studios · All rights reserved</p>
+        <ul class="footer-links" role="list">
+          <li><a href="/arcade/">Studio</a></li>
+          <li><a href="/arcade/dice-21/">Dice 21</a></li>
+          <li><a href="/arcade/poker-dice/">Poker Dice</a></li>
+          <li><a href="/arcade/prism/">Prism</a></li>
+          <li><a href="/arcade/privacy-policy/">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    for (const el of document.querySelectorAll('.copyright-year')) {
+      el.textContent = new Date().getFullYear()
+    }
+
+    ;(function () {
+      const cards   = document.querySelectorAll('.theory-card')
+      const counter = document.getElementById('theoryCounter')
+      const reset   = document.getElementById('theoryReset')
+      if (!cards.length) return
+
+      let revealed = 0
+
+      function updateCounter() {
+        if (revealed === cards.length) {
+          counter.innerHTML = '<strong>All 8 principles revealed.</strong>'
+          reset.hidden = false
+        } else if (revealed === 0) {
+          counter.textContent = ''
+          reset.hidden = true
+        } else {
+          counter.innerHTML = `Discovered <strong>${revealed}</strong> of 8`
+        }
+      }
+
+      cards.forEach(card => {
+        const flip = () => {
+          if (card.classList.contains('tc-flipped')) return
+          card.classList.add('tc-flipped')
+          card.setAttribute('aria-pressed', 'true')
+          revealed++
+          updateCounter()
+        }
+        card.addEventListener('click', flip)
+        card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip() } })
+      })
+
+      reset.addEventListener('click', () => {
+        cards.forEach(c => { c.classList.remove('tc-flipped'); c.setAttribute('aria-pressed', 'false') })
+        revealed = 0
+        updateCounter()
+      })
+    })()
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prism · 10 Speed Studios</title>
+  <meta name="description" content="Prism — find every matching pair. Clear the crystal." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #06090f;
+      --bg2:   #0c1220;
+      --edge:  rgba(255, 255, 255, 0.07);
+      --text:  #e8eaf0;
+      --muted: rgba(232, 234, 240, 0.42);
+      --gold:  #c8a96e;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+
+    /* ── Nav ─────────────────────────────────── */
+    .p-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(1rem, 4vw, 2.5rem);
+      background: rgba(6, 9, 15, 0.9);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--edge);
+    }
+
+    .p-nav-home {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+    .p-nav-home:hover { color: var(--text); }
+
+    .p-nav-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+    }
+
+    .p-nav-restart {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      background: none;
+      border: 1px solid var(--edge);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: color 0.18s, border-color 0.18s;
+    }
+    .p-nav-restart:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .p-nav-restart[hidden] { display: none; }
+
+    /* ── Screens ─────────────────────────────── */
+    body { padding-top: 52px; }
+
+    .screen {
+      min-height: calc(100vh - 52px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+    .screen:not(.active) { display: none; }
+
+    /* ── Start screen ────────────────────────── */
+    .start-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+      text-align: center;
+    }
+
+    .prism-icon {
+      width: clamp(80px, 14vw, 118px);
+      filter: drop-shadow(0 0 32px rgba(140, 80, 255, 0.55));
+    }
+
+    .prism-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 14vw, 8rem);
+      letter-spacing: 0.06em;
+      line-height: 0.9;
+      background: linear-gradient(
+        128deg,
+        #ef4444 0%, #f97316 14%, #eab308 28%,
+        #22c55e 44%, #3b82f6 60%, #a855f7 78%, #ec4899 100%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .prism-sub {
+      font-size: 0.92rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.75;
+    }
+
+    .prism-best {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .prism-best strong { color: var(--gold); }
+
+    /* ── Buttons ─────────────────────────────── */
+    .btn-primary {
+      padding: 0.7rem 2.8rem;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.16em;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      box-shadow: 0 4px 28px rgba(124, 58, 237, 0.45);
+      transition: opacity 0.18s, transform 0.14s;
+      margin-top: 0.4rem;
+    }
+    .btn-primary:hover  { opacity: 0.85; transform: translateY(-2px); }
+    .btn-primary:active { transform: none; }
+
+    .btn-link {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.18s;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+    .btn-link:hover { color: var(--text); }
+
+    /* ── HUD ─────────────────────────────────── */
+    .hud {
+      display: flex;
+      gap: clamp(1.75rem, 7vw, 4rem);
+      margin-bottom: 1.4rem;
+    }
+
+    .hud-item { text-align: center; }
+
+    .hud-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.1rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .hud-val .sub {
+      font-size: 0.65em;
+      opacity: 0.4;
+    }
+
+    .hud-label {
+      margin-top: 3px;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── Board ───────────────────────────────── */
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(8px, 1.8vw, 13px);
+      width: min(480px, 94vw);
+    }
+
+    /* ── Card ────────────────────────────────── */
+    .card {
+      aspect-ratio: 5 / 7;
+      cursor: pointer;
+      perspective: 700px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .card:focus-visible {
+      outline: 2px solid rgba(255,255,255,0.3);
+      outline-offset: 3px;
+      border-radius: 8px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.38s cubic-bezier(0.4, 0.2, 0.2, 1);
+      border-radius: 8px;
+    }
+    .card.flipped .card-inner,
+    .card.matched .card-inner { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* Card back */
+    .card-back {
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .card-back::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        60deg,
+        transparent, transparent 8px,
+        rgba(255,255,255,0.011) 8px, rgba(255,255,255,0.011) 9px
+      );
+    }
+    .card-back-mark {
+      width: 36%;
+      opacity: 0.13;
+    }
+
+    /* Card front */
+    .card-front {
+      transform: rotateY(180deg);
+      background: var(--bg2);
+      border: 1px solid var(--gem-border, rgba(255,255,255,0.1));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 4px;
+      overflow: hidden;
+    }
+    /* colour wash */
+    .card-front::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gem-color);
+      opacity: 0.055;
+      pointer-events: none;
+    }
+    /* radial glow */
+    .card-front::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 32%, var(--gem-glow), transparent 62%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .gem-svg {
+      width: 58%;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 2px 10px var(--gem-glow));
+    }
+
+    .gem-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(0.48rem, 1.3vw, 0.66rem);
+      letter-spacing: 0.16em;
+      color: var(--gem-color);
+      opacity: 0.78;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Matched */
+    .card.matched .card-front {
+      border-color: var(--gem-border-hi, rgba(255,255,255,0.25));
+    }
+    .card.matched .card-front::before { opacity: 0.1; }
+    .card.matched .card-front::after  { opacity: 0.75; }
+    .card.matched .card-inner {
+      animation: matchPop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes matchPop {
+      0%   { transform: rotateY(180deg) scale(1); }
+      50%  { transform: rotateY(180deg) scale(1.09); }
+      100% { transform: rotateY(180deg) scale(1); }
+    }
+
+    /* Wrong shake */
+    .card.wrong .card-inner {
+      animation: shakeWrong 0.38s ease;
+    }
+    @keyframes shakeWrong {
+      0%, 100% { transform: rotateY(180deg) translateX(0); }
+      22%       { transform: rotateY(180deg) translateX(-7px); }
+      60%       { transform: rotateY(180deg) translateX( 7px); }
+      82%       { transform: rotateY(180deg) translateX(-3px); }
+    }
+
+    /* ── Win screen ──────────────────────────── */
+    .win-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4rem;
+      text-align: center;
+    }
+
+    .win-badge {
+      width: clamp(68px, 12vw, 105px);
+      filter: drop-shadow(0 0 32px rgba(34, 197, 94, 0.55));
+    }
+
+    .win-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 9vw, 5rem);
+      letter-spacing: 0.05em;
+      line-height: 0.92;
+      background: linear-gradient(125deg, #22c55e 20%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .win-stats {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .win-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .win-stat-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .win-stat-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .win-new-best {
+      font-size: 0.78rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+    .win-new-best[hidden] { display: none; }
+
+    /* ── Responsive ──────────────────────────── */
+    @media (max-height: 760px) { .board { width: min(400px, 94vw); } }
+    @media (max-width: 380px)  { .gem-name { display: none; } }
+  </style>
+</head>
+<body>
+
+  <nav class="p-nav">
+    <a href="/arcade/" class="p-nav-home">10 Speed Studios</a>
+    <span class="p-nav-title">PRISM</span>
+    <button id="btnRestart" class="p-nav-restart" hidden aria-label="Restart game">↺</button>
+  </nav>
+
+  <!-- ── Start ─────────────────────────────────── -->
+  <div id="screenStart" class="screen active">
+    <div class="start-inner">
+
+      <div class="prism-icon" aria-hidden="true">
+        <svg viewBox="0 0 140 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="prism_body" x1="70" y1="10" x2="70" y2="114" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stop-color="#b090ff" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#4060e0" stop-opacity="0.2"/>
+            </linearGradient>
+          </defs>
+          <polygon points="70,10 126,114 14,114"
+            fill="url(#prism_body)" stroke="rgba(200,180,255,0.65)" stroke-width="1.5"/>
+          <polygon points="70,10 126,114 70,88" fill="rgba(80,40,180,0.22)"/>
+          <polygon points="70,10 14,114 70,88"  fill="rgba(40,20,100,0.18)"/>
+          <line x1="14"  y1="114" x2="126" y2="114" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
+          <!-- input ray -->
+          <line x1="0"   y1="52"  x2="46"  y2="69"  stroke="rgba(255,255,255,0.62)" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- spectrum -->
+          <line x1="109" y1="104" x2="138" y2="88"  stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="111" y1="107" x2="140" y2="93"  stroke="#f97316" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="113" y1="110" x2="141" y2="99"  stroke="#eab308" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="113" y1="113" x2="141" y2="104" stroke="#22c55e" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="113" y1="116" x2="140" y2="110" stroke="#3b82f6" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="112" y1="118" x2="138" y2="116" stroke="#a855f7" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="110" y1="121" x2="135" y2="122" stroke="#ec4899" stroke-width="2"   stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h1 class="prism-title">PRISM</h1>
+      <p class="prism-sub">Find every matching pair.<br>Clear the crystal.</p>
+      <p id="bestDisplay" class="prism-best" hidden>Best: <strong id="bestVal">—</strong> moves</p>
+      <button id="btnStart" class="btn-primary">Play</button>
+    </div>
+  </div>
+
+  <!-- ── Game ──────────────────────────────────── -->
+  <div id="screenGame" class="screen">
+    <div class="hud" role="status" aria-live="polite" aria-label="Game stats">
+      <div class="hud-item">
+        <div class="hud-val" id="statMoves">0</div>
+        <div class="hud-label">Moves</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-val">
+          <span id="statMatched">0</span><span class="sub">/4</span>
+        </div>
+        <div class="hud-label">Matched</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-val" id="statTime">0:00</div>
+        <div class="hud-label">Time</div>
+      </div>
+    </div>
+    <div id="board" class="board" role="grid" aria-label="Prism matching board" style="width:min(360px,94vw)"></div>
+  </div>
+
+  <!-- ── Win ───────────────────────────────────── -->
+  <div id="screenWin" class="screen">
+    <div class="win-inner">
+
+      <div class="win-badge" aria-hidden="true">
+        <svg viewBox="0 0 140 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="win_body" x1="70" y1="10" x2="70" y2="114" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stop-color="#4ade80" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.2"/>
+            </linearGradient>
+          </defs>
+          <polygon points="70,10 126,114 14,114"
+            fill="url(#win_body)" stroke="rgba(150,255,200,0.55)" stroke-width="1.5"/>
+          <polygon points="70,10 126,114 70,88" fill="rgba(20,100,60,0.22)"/>
+          <polygon points="70,10 14,114 70,88"  fill="rgba(10,60,40,0.18)"/>
+          <line x1="14"  y1="114" x2="126" y2="114" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
+          <line x1="0"   y1="52"  x2="46"  y2="69"  stroke="rgba(255,255,255,0.62)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="109" y1="104" x2="138" y2="88"  stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="111" y1="107" x2="140" y2="93"  stroke="#f97316" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="113" y1="110" x2="141" y2="99"  stroke="#eab308" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="113" y1="113" x2="141" y2="104" stroke="#22c55e" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="113" y1="116" x2="140" y2="110" stroke="#3b82f6" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="112" y1="118" x2="138" y2="116" stroke="#a855f7" stroke-width="2"   stroke-linecap="round"/>
+          <line x1="110" y1="121" x2="135" y2="122" stroke="#ec4899" stroke-width="2"   stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h2 class="win-title">Crystal<br>Clear</h2>
+
+      <div class="win-stats">
+        <div class="win-stat">
+          <div class="win-stat-val" id="winMoves">—</div>
+          <div class="win-stat-label">Moves</div>
+        </div>
+        <div class="win-stat">
+          <div class="win-stat-val" id="winTime">—</div>
+          <div class="win-stat-label">Time</div>
+        </div>
+        <div class="win-stat">
+          <div class="win-stat-val" id="winRating">—</div>
+          <div class="win-stat-label">Rating</div>
+        </div>
+      </div>
+
+      <p id="winNewBest" class="win-new-best" hidden>✦ New best</p>
+      <button id="btnAgain" class="btn-primary">Play Again</button>
+      <a href="/arcade/" class="btn-link">← Back to Arcade</a>
+    </div>
+  </div>
+
+  <script>
+    /* ── Gem definitions ─────────────────────────── */
+    const GEMS = [
+      { id: 'ruby',     color: '#ef4444', glow: 'rgba(239,68,68,0.5)',   border: 'rgba(239,68,68,0.3)',   borderHi: 'rgba(239,68,68,0.65)',   name: 'RUBY'     },
+      { id: 'jade',     color: '#22c55e', glow: 'rgba(34,197,94,0.5)',   border: 'rgba(34,197,94,0.3)',   borderHi: 'rgba(34,197,94,0.65)',   name: 'JADE'     },
+      { id: 'sapphire', color: '#3b82f6', glow: 'rgba(59,130,246,0.5)',  border: 'rgba(59,130,246,0.3)',  borderHi: 'rgba(59,130,246,0.65)',  name: 'SAPPHIRE' },
+      { id: 'amethyst', color: '#a855f7', glow: 'rgba(168,85,247,0.5)',  border: 'rgba(168,85,247,0.3)',  borderHi: 'rgba(168,85,247,0.65)',  name: 'AMETHYST' },
+    ]
+
+    /* ── State ───────────────────────────────────── */
+    let deck      = []
+    let revealed  = []   // max 2 cards mid-check
+    let matched   = 0
+    let moves     = 0
+    let gameStart = null
+    let timerId   = null
+    let locked    = false
+
+    /* ── DOM refs ────────────────────────────────── */
+    const $ = id => document.getElementById(id)
+    const screenStart = $('screenStart')
+    const screenGame  = $('screenGame')
+    const screenWin   = $('screenWin')
+    const board       = $('board')
+    const btnRestart  = $('btnRestart')
+    const statMoves   = $('statMoves')
+    const statMatched = $('statMatched')
+    const statTime    = $('statTime')
+
+    /* ── Gem SVG factory ─────────────────────────── */
+    function gemSVG(gem) {
+      const c = gem.color
+      return `<svg class="gem-svg" viewBox="0 0 80 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="40,4 76,28 76,64 40,88 4,64 4,28" fill="${c}" opacity="0.07"/>
+        <polygon points="40,4 76,28 40,46" fill="${c}" opacity="0.82"/>
+        <polygon points="40,4 4,28 40,46"  fill="${c}" opacity="0.60"/>
+        <polygon points="76,28 76,64 40,70 40,46" fill="${c}" opacity="0.47"/>
+        <polygon points="4,28 4,64 40,70 40,46"   fill="${c}" opacity="0.32"/>
+        <polygon points="4,64 40,88 76,64 40,70"  fill="${c}" opacity="0.44"/>
+        <polygon points="30,10 56,22 44,30 22,22" fill="white" opacity="0.26"/>
+      </svg>`
+    }
+
+    /* ── Utilities ───────────────────────────────── */
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = 0 | (Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]]
+      }
+      return arr
+    }
+
+    function fmtTime(ms) {
+      const s = Math.floor(ms / 1000)
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+    }
+
+    /* S if ≤4 (perfect), A if ≤6, B if ≤9, C if ≤13, else D */
+    function rating(m) {
+      return m <= 4 ? 'S' : m <= 6 ? 'A' : m <= 9 ? 'B' : m <= 13 ? 'C' : 'D'
+    }
+
+    function showScreen(el) {
+      [screenStart, screenGame, screenWin].forEach(s => s.classList.remove('active'))
+      el.classList.add('active')
+    }
+
+    /* ── Best score (localStorage) ───────────────── */
+    function loadBest() {
+      try { return JSON.parse(localStorage.getItem('prism_best') || 'null') } catch { return null }
+    }
+
+    function saveBest(m) {
+      const prev = loadBest()
+      if (!prev || m < prev) { localStorage.setItem('prism_best', m); return true }
+      return false
+    }
+
+    function refreshBestDisplay() {
+      const best = loadBest()
+      if (best) { $('bestVal').textContent = best; $('bestDisplay').hidden = false }
+    }
+
+    /* ── Board ───────────────────────────────────── */
+    function buildDeck() {
+      deck = shuffle([...GEMS, ...GEMS].map((g, i) => ({ ...g, uid: i })))
+    }
+
+    function renderBoard() {
+      board.innerHTML = ''
+      deck.forEach((gem, idx) => {
+        const card = document.createElement('div')
+        card.className = 'card'
+        card.setAttribute('role', 'gridcell')
+        card.setAttribute('tabindex', '0')
+        card.setAttribute('aria-label', 'Face-down card')
+        card.innerHTML =
+          `<div class="card-inner">` +
+            `<div class="card-face card-back">` +
+              `<svg class="card-back-mark" viewBox="0 0 80 92" fill="none" aria-hidden="true">` +
+                `<polygon points="40,4 76,28 76,64 40,88 4,64 4,28"` +
+                ` stroke="rgba(255,255,255,1)" stroke-width="1.5" fill="none"/>` +
+              `</svg>` +
+            `</div>` +
+            `<div class="card-face card-front"` +
+              ` style="--gem-color:${gem.color};--gem-glow:${gem.glow};--gem-border:${gem.border};--gem-border-hi:${gem.borderHi}">` +
+              gemSVG(gem) +
+              `<span class="gem-name">${gem.name}</span>` +
+            `</div>` +
+          `</div>`
+        card.addEventListener('click', () => onCardClick(card, idx))
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onCardClick(card, idx) }
+        })
+        board.appendChild(card)
+      })
+    }
+
+    /* ── Card interaction ────────────────────────── */
+    function onCardClick(card, idx) {
+      if (locked) return
+      if (card.classList.contains('flipped')) return
+      if (card.classList.contains('matched')) return
+
+      card.classList.add('flipped')
+      card.setAttribute('aria-label', deck[idx].name)
+      revealed.push({ card, idx })
+
+      if (!gameStart) {
+        gameStart = Date.now()
+        timerId = setInterval(() => {
+          statTime.textContent = fmtTime(Date.now() - gameStart)
+        }, 500)
+      }
+
+      if (revealed.length === 2) {
+        locked = true
+        moves++
+        statMoves.textContent = moves
+        setTimeout(checkMatch, 480)
+      }
+    }
+
+    function checkMatch() {
+      const [a, b] = revealed
+
+      if (deck[a.idx].id === deck[b.idx].id) {
+        /* ✓ Match */
+        a.card.classList.add('matched')
+        b.card.classList.add('matched')
+        matched++
+        statMatched.textContent = matched
+        revealed = []
+        locked   = false
+        if (matched === GEMS.length) setTimeout(endGame, 550)
+      } else {
+        /* ✗ Shake + flip back */
+        a.card.classList.add('wrong')
+        b.card.classList.add('wrong')
+        setTimeout(() => {
+          a.card.classList.remove('flipped', 'wrong')
+          b.card.classList.remove('flipped', 'wrong')
+          a.card.setAttribute('aria-label', 'Face-down card')
+          b.card.setAttribute('aria-label', 'Face-down card')
+          revealed = []
+          locked   = false
+        }, 800)
+      }
+    }
+
+    /* ── Game flow ───────────────────────────────── */
+    function startGame() {
+      revealed  = []
+      matched   = 0
+      moves     = 0
+      gameStart = null
+      locked    = false
+      clearInterval(timerId)
+      timerId = null
+
+      statMoves.textContent   = '0'
+      statMatched.textContent = '0'
+      statTime.textContent    = '0:00'
+
+      buildDeck()
+      renderBoard()
+      btnRestart.hidden = false
+      showScreen(screenGame)
+    }
+
+    function endGame() {
+      clearInterval(timerId)
+      const elapsed   = Date.now() - gameStart
+      const isNewBest = saveBest(moves)
+
+      $('winMoves').textContent  = moves
+      $('winTime').textContent   = fmtTime(elapsed)
+      $('winRating').textContent = rating(moves)
+      $('winNewBest').hidden     = !isNewBest
+      refreshBestDisplay()
+
+      btnRestart.hidden = true
+      showScreen(screenWin)
+    }
+
+    /* ── Events ──────────────────────────────────── */
+    $('btnStart').addEventListener('click', startGame)
+    $('btnAgain').addEventListener('click', startGame)
+    btnRestart.addEventListener('click', startGame)
+
+    /* ── Init ────────────────────────────────────── */
+    refreshBestDisplay()
+  </script>
+</body>
+</html>

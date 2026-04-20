@@ -1,17 +1,1300 @@
 <!DOCTYPE html>
-<!-- Dice 21 project — Copyright © Whittfield Holmes. All rights reserved. -->
+<!-- 10 Speed Studios — Copyright © Whittfield Holmes. All rights reserved. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Whittfield Holmes" />
     <meta name="copyright" content="Copyright © Whittfield Holmes" />
-    <meta http-equiv="refresh" content="0; url=dice-21/" />
-    <title>Dice 21</title>
-    <script>
-      location.replace('dice-21/')
-    </script>
+    <meta
+      name="description"
+      content="10 Speed Studios makes browser-based games — sharp mechanics, zero friction, built to play again."
+    />
+    <title>10 Speed Studios — Browser Games</title>
+    <link rel="icon" href="/arcade/assets/favicon-D8NRme3X.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg:            #07090f;
+        --bg-2:          #0c0f1a;
+        --bg-3:          #131624;
+        --text:          #dde4f0;
+        --text-muted:    #6e7a8e;
+        --text-dim:      #9aa3b2;
+        --gold:          #c8a96e;
+        --gold-bright:   #e2c47a;
+        --gold-dim:      rgba(200, 169, 110, 0.15);
+        --gold-border:   rgba(200, 169, 110, 0.28);
+        --green:         #3ec98a;
+        --font-display:  'Bebas Neue', ui-sans-serif, system-ui, sans-serif;
+        --font-body:     'DM Sans', ui-sans-serif, system-ui, sans-serif;
+        --max-w:         72rem;
+        --gutter:        clamp(1.25rem, 5vw, 3.5rem);
+      }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        line-height: 1.6;
+        font-weight: 400;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ─── NAV ─────────────────────────────────── */
+
+      .nav {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.1rem var(--gutter);
+        background: rgba(7, 9, 15, 0.82);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+      }
+
+      .nav-wordmark {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        letter-spacing: 0.1em;
+        color: var(--gold-bright);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.82rem;
+        letter-spacing: 0.05em;
+        transition: color 0.18s;
+      }
+
+      .nav-links a:hover,
+      .nav-links a:focus-visible { color: var(--text); }
+
+      .nav-links a:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+
+      /* ─── HERO ────────────────────────────────── */
+
+      .hero {
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 7rem var(--gutter) clamp(3.5rem, 8vh, 5.5rem);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-ambient {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background:
+          radial-gradient(ellipse 70% 55% at 60% 35%, rgba(200, 169, 110, 0.07) 0%, transparent 65%),
+          linear-gradient(175deg, #0b0d18 0%, #07090f 100%);
+        animation: ambientDrift 18s ease-in-out infinite alternate;
+      }
+
+      @keyframes ambientDrift {
+        from { transform: scale(1)    translate(0%,  0%); }
+        to   { transform: scale(1.04) translate(2%, -2%); }
+      }
+
+      #hero-canvas {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 1;
+        max-width: 56rem;
+      }
+
+      .hero-eyebrow {
+        font-size: 0.72rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 1rem;
+        clip-path: inset(0 100% 0 0);  /* hidden until .in-view */
+      }
+
+      .hero-headline {
+        font-family: var(--font-display);
+        font-size: clamp(4.5rem, 13vw, 10.5rem);
+        line-height: 0.9;
+        letter-spacing: 0.015em;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+      }
+
+      /* Overflow mask per line — words slide up from below */
+      .h-line {
+        display: block;
+        overflow: hidden;
+        padding-bottom: 0.06em;
+        margin-bottom: -0.06em;
+      }
+
+      .h-word {
+        display: inline-block;
+        transform: translateY(115%);  /* hidden until .in-view */
+      }
+
+      .hero-headline em {
+        font-style: normal;
+        color: var(--gold-bright);
+      }
+
+      .hero-rule {
+        width: 2.75rem;
+        height: 2px;
+        background: linear-gradient(to right, var(--gold), transparent);
+        margin: 1.6rem 0;
+        transform: scaleX(0);  /* hidden until .in-view */
+        transform-origin: left;
+      }
+
+      .hero-sub {
+        font-size: clamp(1rem, 2.2vw, 1.2rem);
+        color: var(--text-dim);
+        font-weight: 300;
+        max-width: 26rem;
+        margin-bottom: 2.5rem;
+        opacity: 0;  /* hidden until .in-view */
+      }
+
+      .hero-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: var(--gold-bright);
+        text-decoration: none;
+        font-size: 0.8rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 500;
+        opacity: 0;  /* hidden until .in-view */
+        transition: gap 0.2s;
+      }
+
+      /* ── Hero animations — fire each time .in-view is added ── */
+      .hero.in-view .hero-eyebrow {
+        animation: eyebrowIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.05s;
+      }
+      .hero.in-view .h-word {
+        animation: slideUpWord 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards var(--d, 0s);
+      }
+      .hero.in-view .hero-rule {
+        animation: ruleIn 0.5s ease-out forwards 0.54s;
+      }
+      .hero.in-view .hero-sub {
+        animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.68s;
+      }
+      .hero.in-view .hero-cta {
+        animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.84s;
+      }
+
+      .hero-cta:hover { gap: 0.8rem; }
+
+      .hero-cta:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+
+      .hero-cta-arrow {
+        display: inline-block;
+        transition: transform 0.2s;
+      }
+
+      .hero-cta:hover .hero-cta-arrow { transform: translateY(3px); }
+
+      /* ─── SECTION SHELL ───────────────────────── */
+
+      .section {
+        padding: clamp(4rem, 9vw, 7rem) var(--gutter);
+        max-width: calc(var(--max-w) + var(--gutter) * 2);
+        margin-inline: auto;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 2.25rem;
+        padding-bottom: 0.9rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+      }
+
+      .section-label {
+        font-family: var(--font-display);
+        font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+        letter-spacing: 0.07em;
+        color: var(--text);
+      }
+
+      .section-meta {
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      /* ─── GAMES GRID ──────────────────────────── */
+
+      .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+        gap: 1rem;
+      }
+
+      .game-card {
+        position: relative;
+        background: var(--bg-2);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 3px;
+        padding: 2rem 1.75rem 1.6rem;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+        overflow: hidden;
+        transition: border-color 0.28s, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s;
+        min-height: 16rem;
+      }
+
+      .game-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(130deg, var(--gold-dim) 0%, transparent 55%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+
+      .game-card[href]:hover {
+        border-color: var(--gold-border);
+        transform: translateY(-4px);
+        box-shadow:
+          0 20px 50px rgba(0, 0, 0, 0.55),
+          0 0 0 1px rgba(200, 169, 110, 0.1);
+      }
+
+      .game-card[href]:hover::after { opacity: 1; }
+
+      .game-card[href]:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+      }
+
+      .game-symbol {
+        position: absolute;
+        top: 1.4rem;
+        right: 1.5rem;
+        font-size: 1.9rem;
+        line-height: 1;
+        letter-spacing: 0.05em;
+        opacity: 0.18;
+        user-select: none;
+        pointer-events: none;
+        transition: opacity 0.28s;
+      }
+
+      .game-card[href]:hover .game-symbol { opacity: 0.28; }
+
+      .game-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.6rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-weight: 500;
+        padding: 0.22rem 0.55rem;
+        border-radius: 2px;
+        width: fit-content;
+      }
+
+      .badge-live {
+        background: rgba(62, 201, 138, 0.1);
+        color: var(--green);
+        border: 1px solid rgba(62, 201, 138, 0.22);
+      }
+
+      .badge-live::before {
+        content: '';
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--green);
+        flex-shrink: 0;
+      }
+
+      .badge-soon {
+        background: rgba(200, 169, 110, 0.08);
+        color: var(--gold);
+        border: 1px solid rgba(200, 169, 110, 0.18);
+      }
+
+      .game-name {
+        font-family: var(--font-display);
+        font-size: clamp(1.55rem, 3.5vw, 1.9rem);
+        letter-spacing: 0.04em;
+        color: var(--text);
+        line-height: 1;
+      }
+
+      .game-desc {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        line-height: 1.65;
+        flex: 1;
+      }
+
+      .game-play {
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 500;
+        margin-top: 0.25rem;
+        transition: letter-spacing 0.2s;
+      }
+
+      .game-card[href]:hover .game-play { letter-spacing: 0.18em; }
+
+      .game-play-dim {
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        font-weight: 400;
+        opacity: 0.5;
+        margin-top: 0.25rem;
+      }
+
+      /* ─── STUDIO ──────────────────────────────── */
+
+      .studio-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .studio-inner {
+        max-width: 38rem;
+      }
+
+      .studio-statement {
+        font-family: var(--font-display);
+        font-size: clamp(1.8rem, 4vw, 2.7rem);
+        letter-spacing: 0.04em;
+        line-height: 1.08;
+        color: var(--text);
+        margin-bottom: 1.35rem;
+      }
+
+      .studio-body {
+        font-size: 0.98rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        line-height: 1.8;
+        max-width: 30rem;
+      }
+
+      /* ─── FOOTER ──────────────────────────────── */
+
+      .footer {
+        padding: 1.75rem var(--gutter);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        max-width: calc(var(--max-w) + var(--gutter) * 2);
+        margin-inline: auto;
+      }
+
+      .footer-copy {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 1.75rem;
+        list-style: none;
+        flex-wrap: wrap;
+      }
+
+      .footer-links a {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.18s;
+      }
+
+      .footer-links a:hover { color: var(--text); }
+
+      .footer-links a:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+
+      /* ─── SCROLL REVEAL ───────────────────────── */
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(22px);
+        transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .reveal.is-visible {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ─── ANIMATIONS ──────────────────────────── */
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); filter: blur(6px); }
+        to   { opacity: 1; transform: none;             filter: blur(0);   }
+      }
+
+      @keyframes eyebrowIn {
+        to { clip-path: inset(0 0% 0 0); }
+      }
+
+      @keyframes slideUpWord {
+        from { transform: translateY(115%); }
+        to   { transform: translateY(0);    }
+      }
+
+      @keyframes ruleIn {
+        from { transform: scaleX(0); }
+        to   { transform: scaleX(1); }
+      }
+
+      /* ─── RESPONSIVE ──────────────────────────── */
+
+      @media (max-width: 600px) {
+        .nav-links { display: none; }
+        .section-header { flex-direction: column; gap: 0.2rem; }
+        .footer { flex-direction: column; align-items: flex-start; }
+      }
+
+      /* ─── GAME THEORY SECTION ──────────────────────── */
+
+      /* ─── FOR / FLIP BOARD ─────────────────────────── */
+
+      .for-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .board-wrap { text-align: center; }
+
+      .board-eyebrow {
+        font-size: 0.72rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 1.75rem;
+      }
+
+      /* The board panel */
+      .flap-board {
+        display: inline-flex;
+        gap: 3px;
+        padding: 16px 20px;
+        background: #040609;
+        border: 1px solid rgba(200, 169, 110, 0.18);
+        border-radius: 6px;
+        box-shadow:
+          0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+          0 28px 80px rgba(0, 0, 0, 0.75),
+          0 0 60px rgba(200, 169, 110, 0.04);
+        margin-bottom: 1.5rem;
+        font-size: clamp(26px, 4.2vw, 56px);
+        perspective: 800px;
+      }
+
+      /* Character cell */
+      .flap-cell {
+        position: relative;
+        width: 0.84em;
+        height: 1.25em;
+        border-radius: 3px;
+        background: #0c1220;
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+
+      /* Space between words */
+      .flap-cell.is-space {
+        width: 0.36em;
+        background: transparent;
+      }
+      .flap-cell.is-space::after { display: none; }
+
+      /* Center divider — the signature split-flap gap */
+      .flap-cell::after {
+        content: '';
+        position: absolute;
+        top: calc(50% - 0.5px);
+        left: 0; right: 0;
+        height: 1px;
+        background: #01030a;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      /* fc-char: always shows current character, full height */
+      .fc-char {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #121c30 0%, #0b1220 100%);
+      }
+
+      .fc-char span {
+        font-family: var(--font-display);
+        font-size: 1em;
+        line-height: 1.25em;
+        color: #ead080;
+        text-shadow: 0 0 18px rgba(234, 208, 128, 0.5);
+        display: block;
+        flex-shrink: 0;
+      }
+
+      /* fc-flap: covers top half, shows OLD char, folds away on transition */
+      .fc-flap {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 50%;
+        overflow: hidden;
+        transform-origin: bottom center;
+        z-index: 5;
+        background: linear-gradient(180deg, #16203a 0%, #101828 100%);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+      }
+
+      .fc-flap span {
+        font-family: var(--font-display);
+        font-size: 1em;
+        line-height: 1.25em;
+        color: #ead080;
+        text-shadow: 0 0 18px rgba(234, 208, 128, 0.5);
+        display: block;
+      }
+
+      .fc-flap.folding {
+        animation: flapFold 0.24s cubic-bezier(0.55, 0, 0.75, 0) forwards;
+      }
+
+      @keyframes flapFold {
+        from { transform: rotateX(0deg);   }
+        to   { transform: rotateX(-90deg); }
+      }
+
+      /* Dot nav */
+      .board-dots {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 2.5rem;
+      }
+
+      .board-dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        padding: 0;
+        background: rgba(200, 169, 110, 0.14);
+        border: 1px solid rgba(200, 169, 110, 0.28);
+        cursor: pointer;
+        transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+      }
+
+      .board-dot:hover { transform: scale(1.4); }
+
+      .board-dot.is-active {
+        background: var(--gold);
+        border-color: var(--gold);
+        box-shadow: 0 0 10px rgba(200, 169, 110, 0.55);
+      }
+
+      /* Use-case descriptors */
+      .for-items {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .for-item {
+        padding: 1.2rem 1.4rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+        transition: background 0.18s;
+      }
+
+      .for-item:last-child { border-right: none; }
+      .for-item:hover { background: rgba(255, 255, 255, 0.025); }
+
+      .for-item-name {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        letter-spacing: 0.07em;
+        color: var(--text);
+        margin-bottom: 0.3rem;
+      }
+
+      .for-item-desc {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        line-height: 1.55;
+      }
+
+      .for-learn {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .for-learn a {
+        font-size: 0.82rem;
+        color: var(--gold);
+        text-decoration: none;
+        letter-spacing: 0.04em;
+        transition: color 0.18s;
+        opacity: 0.8;
+      }
+
+      .for-learn a:hover { color: var(--gold-bright); opacity: 1; }
+
+      @media (max-width: 700px) {
+        .for-items { grid-template-columns: 1fr 1fr; }
+        .for-item:nth-child(2n) { border-right: none; }
+        .for-item { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+      }
+
+      @media (max-width: 420px) {
+        .for-items { grid-template-columns: 1fr; }
+        .for-item { border-right: none; }
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+        .hero-ambient { animation: none; }
+        .reveal { opacity: 1; transform: none; }
+        /* Skip to final state immediately — no animations */
+        .hero-eyebrow { clip-path: none !important; animation: none !important; }
+        .h-word { transform: none !important; animation: none !important; }
+        .hero-rule { transform: none !important; animation: none !important; }
+        .hero-sub, .hero-cta { opacity: 1 !important; filter: none !important; animation: none !important; }
+      }
+    </style>
   </head>
   <body>
-    <p><a href="dice-21/">Open Dice 21</a></p>
+
+    <!-- NAV -->
+    <nav class="nav" role="banner">
+      <a href="/arcade/" class="nav-wordmark" aria-label="10 Speed Studios home">10 Speed Studios</a>
+      <ul class="nav-links" role="list">
+        <li><a href="#games">Games</a></li>
+        <li><a href="/arcade/gamification/">Gamification</a></li>
+        <li><a href="#studio">Studio</a></li>
+        <li><a href="/arcade/privacy-policy/">Privacy</a></li>
+      </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" aria-label="10 Speed Studios">
+      <div class="hero-ambient" aria-hidden="true"></div>
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-content">
+        <p class="hero-eyebrow">10 Speed Studios</p>
+        <h1 class="hero-headline" aria-label="Built to Play Again.">
+          <span class="h-line"><span class="h-word" style="--d:.18s">Built</span></span>
+          <span class="h-line"><span class="h-word" style="--d:.28s">to&nbsp;</span><em class="h-word" style="--d:.36s">Play</em></span>
+          <span class="h-line"><span class="h-word" style="--d:.44s">Again.</span></span>
+        </h1>
+        <div class="hero-rule" aria-hidden="true"></div>
+        <p class="hero-sub">Browser games with sharp mechanics, real progression, and zero friction. Open a tab and play.</p>
+        <a href="#games" class="hero-cta">
+          See our games <span class="hero-cta-arrow" aria-hidden="true">↓</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- GAMES -->
+    <section id="games" aria-labelledby="games-heading">
+      <div class="section" style="padding-bottom: 0;">
+        <div class="section-header reveal">
+          <h2 class="section-label" id="games-heading">Games</h2>
+          <span class="section-meta">5 titles</span>
+        </div>
+      </div>
+      <div class="section" style="padding-top: 0;">
+        <div class="games-grid">
+
+          <a href="https://wholmes.github.io/arcade/dice-21/" target="_blank" rel="noopener noreferrer" class="game-card reveal" data-delay="0">
+            <span class="game-symbol" aria-hidden="true">⚄ ⚂</span>
+            <span class="game-badge badge-live">Live</span>
+            <h3 class="game-name">Dice 21</h3>
+            <p class="game-desc">Push toward 21 without busting. Risk climbs with every roll — beat the dealer or walk away.</p>
+            <span class="game-play">Play now →</span>
+          </a>
+
+          <a href="https://wholmes.github.io/arcade/poker-dice/" target="_blank" rel="noopener noreferrer" class="game-card reveal" data-delay="80">
+            <span class="game-symbol" aria-hidden="true">♠ ♣</span>
+            <span class="game-badge badge-live">Live</span>
+            <h3 class="game-name">Poker Dice</h3>
+            <p class="game-desc">Five dice, three rolls, best hand takes it. Classic poker strategy distilled into pure dice luck.</p>
+            <span class="game-play">Play now →</span>
+          </a>
+
+          <a href="/arcade/prism/" class="game-card reveal" data-delay="160">
+            <span class="game-symbol" aria-hidden="true">◈ ◆</span>
+            <span class="game-badge badge-live">Live</span>
+            <h3 class="game-name">Prism</h3>
+            <p class="game-desc">Sixteen face-down gems, eight hidden pairs. Flip, remember, match. Clear the crystal.</p>
+            <span class="game-play">Play now →</span>
+          </a>
+
+          <a href="https://wholmes.github.io/spacial-match/" target="_blank" rel="noopener noreferrer" class="game-card reveal" data-delay="240">
+            <span class="game-symbol" aria-hidden="true">▦ ▣</span>
+            <span class="game-badge badge-live">Live</span>
+            <h3 class="game-name">Spatial Match</h3>
+            <p class="game-desc">Align 3D blocks of the same type in lines, planes, and volumes. Levels get bigger. Clock gets meaner.</p>
+            <span class="game-play">Play now →</span>
+          </a>
+
+          <div class="game-card reveal" data-delay="320" aria-label="Untitled — coming soon">
+            <span class="game-symbol" aria-hidden="true">◈ ◇</span>
+            <span class="game-badge badge-soon">Coming soon</span>
+            <h3 class="game-name">Untitled 04</h3>
+            <p class="game-desc">Something faster and sharper. Details soon.</p>
+            <span class="game-play-dim">In development</span>
+          </div>
+
+          <div class="game-card reveal" data-delay="400" aria-label="Untitled — coming soon">
+            <span class="game-symbol" aria-hidden="true">⬡ ⬡</span>
+            <span class="game-badge badge-soon">Coming soon</span>
+            <h3 class="game-name">Untitled 05</h3>
+            <p class="game-desc">More in the works. Check back.</p>
+            <span class="game-play-dim">In development</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- BUILT FOR BUSINESS -->
+    <section id="for" class="for-section" aria-labelledby="for-heading">
+      <div class="section">
+
+        <div class="board-wrap reveal">
+          <p class="board-eyebrow" id="for-heading">We build games for</p>
+          <div id="flapBoard" class="flap-board" role="status" aria-live="polite" aria-label="Loading…"></div>
+          <div id="boardDots" class="board-dots" role="group" aria-label="Use cases"></div>
+        </div>
+
+        <p class="for-learn reveal" data-delay="60">
+          <a href="/arcade/gamification/">Why gamification works — and what makes it fail →</a>
+        </p>
+
+        <div class="for-items reveal" data-delay="120">
+          <div class="for-item">
+            <p class="for-item-name">Promotions</p>
+            <p class="for-item-desc">Campaigns people choose to engage with.</p>
+          </div>
+          <div class="for-item">
+            <p class="for-item-name">Marketing</p>
+            <p class="for-item-desc">Brand experiences that actually stick.</p>
+          </div>
+          <div class="for-item">
+            <p class="for-item-name">Employee Engagement</p>
+            <p class="for-item-desc">Teams that want to show up.</p>
+          </div>
+          <div class="for-item">
+            <p class="for-item-name">Customer Loyalty</p>
+            <p class="for-item-desc">Rewards that feel like winning.</p>
+          </div>
+          <div class="for-item">
+            <p class="for-item-name">Live Events</p>
+            <p class="for-item-desc">Moments people remember and share.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- STUDIO -->
+    <section id="studio" class="studio-section" aria-labelledby="studio-heading">
+      <div class="section">
+        <div class="studio-inner reveal">
+          <h2 class="studio-statement" id="studio-heading">
+            We make games people come back to.
+          </h2>
+          <p class="studio-body">
+            We build games for: promotions, marketing, employee engagement, customer loyalty,
+            and live events — wherever you need participation, not just impressions.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+      <p class="footer-copy">© <span class="copyright-year"></span> 10 Speed Studios. All rights reserved.</p>
+      <ul class="footer-links" role="list">
+        <li><a href="/arcade/dice-21/">Dice 21</a></li>
+        <li><a href="/arcade/poker-dice/">Poker Dice</a></li>
+        <li><a href="/arcade/privacy-policy/">Privacy policy</a></li>
+      </ul>
+    </footer>
+
+    <script>
+      // Copyright year
+      for (const el of document.querySelectorAll('.copyright-year')) {
+        el.textContent = new Date().getFullYear()
+      }
+
+      // Scroll reveal with per-card stagger
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return
+            const el = entry.target
+            const delay = parseInt(el.dataset.delay || '0', 10)
+            setTimeout(() => el.classList.add('is-visible'), delay)
+            revealObserver.unobserve(el)
+          })
+        },
+        { threshold: 0.08 }
+      )
+
+      document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el))
+
+      // ── Hero re-entry: replay animations every time the section enters the viewport
+      const heroSection = document.querySelector('.hero')
+      if (heroSection) {
+        new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            heroSection.classList.remove('in-view')
+            void heroSection.offsetHeight  // force reflow to restart animations
+            heroSection.classList.add('in-view')
+          } else {
+            heroSection.classList.remove('in-view')
+          }
+        }, { threshold: 0 }).observe(heroSection)
+      }
+
+      // ── Flip board ────────────────────────────────────────
+      ;(function () {
+        const board  = document.getElementById('flapBoard')
+        const dotsEl = document.getElementById('boardDots')
+        if (!board || !dotsEl) return
+
+        const PHRASES = [
+          'PROMOTIONS',
+          'MARKETING',
+          'EMPLOYEE ENGAGEMENT',
+          'CUSTOMER LOYALTY',
+          'LIVE EVENTS',
+        ]
+
+        const CELLS = 19   // length of longest phrase
+        let cells   = []
+        let current = 0
+        let busy    = false
+        let started = false
+
+        // Build character cells
+        for (let i = 0; i < CELLS; i++) {
+          const el = document.createElement('div')
+          el.className = 'flap-cell is-space'
+          el.innerHTML =
+            '<div class="fc-char"><span>\u00a0</span></div>' +
+            '<div class="fc-flap"><span>\u00a0</span></div>'
+          board.appendChild(el)
+          cells.push({
+            el,
+            char:   el.querySelector('.fc-char span'),
+            flap:   el.querySelector('.fc-flap'),
+            flapTx: el.querySelector('.fc-flap span'),
+            cur:    ' ',
+          })
+        }
+
+        // Build nav dots
+        PHRASES.forEach((label, i) => {
+          const btn = document.createElement('button')
+          btn.className = 'board-dot' + (i === 0 ? ' is-active' : '')
+          btn.setAttribute('aria-label', label)
+          btn.addEventListener('click', () => { if (!busy) goTo(i) })
+          dotsEl.appendChild(btn)
+        })
+
+        function setDot(i) {
+          dotsEl.querySelectorAll('.board-dot').forEach((d, j) =>
+            d.classList.toggle('is-active', j === i)
+          )
+          board.setAttribute('aria-label', PHRASES[i])
+        }
+
+        function flipCell(c, newChar) {
+          if (newChar === c.cur) return
+          const oldChar = c.cur
+          c.cur = newChar
+
+          c.el.classList.toggle('is-space', newChar === ' ')
+
+          // fc-char: update to new char immediately (bottom half visible, top covered by flap)
+          c.char.textContent = newChar === ' ' ? '\u00a0' : newChar
+
+          // fc-flap: shows old char, then folds away
+          c.flapTx.textContent = oldChar === ' ' ? '\u00a0' : oldChar
+          c.flap.classList.remove('folding')
+          void c.flap.offsetWidth  // reflow
+          c.flap.classList.add('folding')
+        }
+
+        function goTo(idx) {
+          if (busy) return
+          busy    = true
+          current = idx
+          setDot(idx)
+
+          const phrase  = PHRASES[idx]
+          const leftPad = Math.floor((CELLS - phrase.length) / 2)
+          const padded  = phrase.padStart(phrase.length + leftPad, ' ').padEnd(CELLS, ' ').split('')
+          let done = 0
+
+          padded.forEach((ch, i) => {
+            setTimeout(() => {
+              flipCell(cells[i], ch)
+              if (++done === CELLS) setTimeout(() => { busy = false }, 280)
+            }, i * 45 + Math.random() * 22)  // stagger + subtle jitter
+          })
+        }
+
+        // Auto-advance interval — starts after first flip
+        function startAuto() {
+          setInterval(() => {
+            if (!busy) goTo((current + 1) % PHRASES.length)
+          }, 3200)
+        }
+
+        // Trigger on scroll into view — board starts blank and "wakes up"
+        new IntersectionObserver((entries) => {
+          if (!entries[0].isIntersecting || started) return
+          started = true
+          setTimeout(() => {
+            goTo(0)
+            setTimeout(startAuto, 3600)
+          }, 250)
+        }, { threshold: 0.4 }).observe(board)
+      })()
+    </script>
+
+    <!-- Three.js hero scene -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script>
+    ;(function () {
+      if (typeof THREE === 'undefined') return
+
+      const canvas = document.getElementById('hero-canvas')
+      const hero   = document.querySelector('.hero')
+      if (!canvas || !hero) return
+
+      const W = () => hero.offsetWidth
+      const H = () => hero.offsetHeight
+
+      // ── Renderer ──────────────────────────────────────────
+      let renderer
+      try {
+        renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
+      } catch (_) { return }
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+      renderer.setSize(W(), H())
+      renderer.setClearColor(0x000000, 0)
+
+      // ── Scene & Camera ────────────────────────────────────
+      const scene  = new THREE.Scene()
+      const camera = new THREE.PerspectiveCamera(52, W() / H(), 0.1, 80)
+      camera.position.set(0, 0, 20)
+
+      // ── Lighting ──────────────────────────────────────────
+      // Ambient: lifts shadows so dark faces aren't pure black
+      scene.add(new THREE.AmbientLight(0xffe8c8, 1.2))
+
+      // Front fill: DirectionalLight has no distance falloff — broad even illumination
+      const frontFill = new THREE.DirectionalLight(0xfff0d8, 1.8)
+      frontFill.position.set(1, 2, 10)
+      scene.add(frontFill)
+
+      // Key light: warm gold, tracks mouse — boosted intensity + longer range
+      const keyLight = new THREE.PointLight(0xd4a860, 500, 100)
+      keyLight.position.set(8, 8, 14)
+      scene.add(keyLight)
+
+      // Cool rim from behind-left
+      const rimLight = new THREE.PointLight(0x3858c0, 180, 80)
+      rimLight.position.set(-12, -6, 8)
+      scene.add(rimLight)
+
+      // Soft top bounce
+      const topLight = new THREE.PointLight(0xffffff, 120, 60)
+      topLight.position.set(0, 14, 6)
+      scene.add(topLight)
+
+      // ── Die face textures ─────────────────────────────────
+      const PIP_XY = [
+        null,
+        [[.50,.50]],
+        [[.30,.30],[.70,.70]],
+        [[.30,.30],[.50,.50],[.70,.70]],
+        [[.30,.30],[.70,.30],[.30,.70],[.70,.70]],
+        [[.30,.30],[.70,.30],[.50,.50],[.30,.70],[.70,.70]],
+        [[.30,.22],[.70,.22],[.30,.50],[.70,.50],[.30,.78],[.70,.78]],
+      ]
+
+      function makeFaceTex(n) {
+        const S = 256
+        const c = document.createElement('canvas')
+        c.width = c.height = S
+        const ctx = c.getContext('2d')
+        ctx.fillStyle = '#0d1422'
+        ctx.fillRect(0, 0, S, S)
+        const p = 9, r = 22
+        ctx.strokeStyle = 'rgba(200,169,110,0.25)'
+        ctx.lineWidth = 5
+        ctx.beginPath()
+        ctx.moveTo(p + r, p)
+        ctx.lineTo(S-p-r, p);    ctx.quadraticCurveTo(S-p, p,   S-p, p+r)
+        ctx.lineTo(S-p, S-p-r);  ctx.quadraticCurveTo(S-p, S-p, S-p-r, S-p)
+        ctx.lineTo(p+r, S-p);    ctx.quadraticCurveTo(p,   S-p, p,   S-p-r)
+        ctx.lineTo(p, p+r);      ctx.quadraticCurveTo(p,   p,   p+r, p)
+        ctx.closePath()
+        ctx.stroke()
+        ctx.fillStyle = '#d4a850'
+        ctx.shadowColor = 'rgba(220,175,80,0.95)'
+        ctx.shadowBlur = 14
+        const R = 19
+        for (const [nx, ny] of PIP_XY[n]) {
+          ctx.beginPath()
+          ctx.arc(nx * S, ny * S, R, 0, Math.PI * 2)
+          ctx.fill()
+        }
+        return new THREE.CanvasTexture(c)
+      }
+
+      const FACE_ORDER = [1, 6, 2, 5, 3, 4]
+      const sharedMats = FACE_ORDER.map(n => new THREE.MeshStandardMaterial({
+        map: makeFaceTex(n), roughness: 0.18, metalness: 0.22,
+      }))
+
+      // ── Dice ──────────────────────────────────────────────
+      const geo = new THREE.BoxGeometry(1.9, 1.9, 1.9)
+
+      const ALL_CONFIGS = [
+        [ 7.5,  3.8, -1.5,  1.45],
+        [ 5.2,  5.8,  0.5,  1.05],
+        [10.2,  1.0, -0.5,  1.15],
+        [ 3.8, -3.8, -2.5,  0.92],
+        [ 8.8, -2.2, -1.0,  0.88],
+        [ 6.8,  1.8,  2.0,  0.68],
+        [ 9.6,  5.2, -4.5,  0.72],
+        [-5.5,  5.2, -5.0,  0.78],
+        [-7.5, -3.5, -2.5,  0.72],
+        [ 4.2, -6.2, -3.0,  0.70],
+        [-2.0,  2.5, -7.0,  0.65],
+        [12.2,  2.5, -3.5,  0.62],
+        [-1.5, -5.5, -5.5,  0.58],
+      ]
+      const configs = W() < 768 ? ALL_CONFIGS.slice(0, 7) : ALL_CONFIGS
+
+      const dice = []
+      for (const [x, y, z, s] of configs) {
+        const mesh = new THREE.Mesh(geo, sharedMats)
+        mesh.position.set(x, y, z)
+        mesh.scale.setScalar(s)
+        mesh.rotation.set(
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2
+        )
+        const spd = (3e-4 + Math.random() * 7e-4) * (Math.random() < .5 ? 1 : -1)
+        mesh.userData.rx = spd * (.6 + Math.random() * .8)
+        mesh.userData.ry = spd * (.6 + Math.random() * .8)
+        mesh.userData.rz = spd * .4
+        // Store home position for scatter math
+        mesh.userData.ox = x
+        mesh.userData.oy = y
+        mesh.userData.oz = z
+        scene.add(mesh)
+        dice.push(mesh)
+      }
+
+      // ── Ambient particles ─────────────────────────────────
+      const P = W() < 768 ? 180 : 350
+      const pArr = new Float32Array(P * 3)
+      for (let i = 0; i < P; i++) {
+        pArr[i*3]   = (Math.random() - .5) * 34
+        pArr[i*3+1] = (Math.random() - .5) * 24
+        pArr[i*3+2] = (Math.random() - .5) * 20 - 6
+      }
+      const pGeo = new THREE.BufferGeometry()
+      pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3))
+      const pMat = new THREE.PointsMaterial({
+        color: 0xc8a96e, size: 0.055, transparent: true, opacity: 0.38,
+        sizeAttenuation: true,
+      })
+      scene.add(new THREE.Points(pGeo, pMat))
+
+      // ── Per-die parallax setup ────────────────────────────
+      // oz ranges roughly −7 → +2; map to factor 0.05 (far/slow) → 1.0 (near/fast)
+      for (const d of dice) {
+        const oz = d.userData.oz
+        const pFactor = Math.max(0.05, Math.min(1.0, (oz + 7) / 9))
+        d.userData.pFactor    = pFactor
+        // Close dice snap fast; far dice lag heavily — different per die
+        d.userData.lerpSpeed  = 0.022 + pFactor * 0.06
+        d.userData.pcX        = 0   // per-die smoothed mouse X
+        d.userData.pcY        = 0   // per-die smoothed mouse Y
+      }
+
+      // ── State ─────────────────────────────────────────────
+      // mouse: normalized −1…+1
+      let tX = 0, tY = 0
+      // camera: tiny residual drift so the scene doesn't feel locked
+      let camCX = 0, camCY = 0
+      let scrollP = 0
+
+      // ── Mouse ─────────────────────────────────────────────
+      window.addEventListener('mousemove', e => {
+        tX =  (e.clientX / window.innerWidth  - .5) * 2
+        tY = -(e.clientY / window.innerHeight - .5) * 2
+      }, { passive: true })
+
+      // ── Scroll ────────────────────────────────────────────
+      window.addEventListener('scroll', () => {
+        scrollP = Math.max(0, Math.min(1, window.scrollY / hero.offsetHeight))
+      }, { passive: true })
+
+      // ── Resize ────────────────────────────────────────────
+      window.addEventListener('resize', () => {
+        camera.aspect = W() / H()
+        camera.updateProjectionMatrix()
+        renderer.setSize(W(), H())
+      })
+
+      // ── Animation loop ────────────────────────────────────
+      ;(function loop() {
+        requestAnimationFrame(loop)
+
+        const sp = scrollP
+
+        // ·· Camera: very subtle drift so the room doesn't feel nailed down
+        camCX += (tX * 0.8 - camCX) * 0.04
+        camCY += (tY * 0.5 - camCY) * 0.04
+        camera.position.x = camCX
+        camera.position.y = camCY
+        camera.lookAt(0, 0, 0)
+
+        // ·· Key light tracks mouse — gold highlights shift across all faces
+        keyLight.position.x = 8 + tX * 5.0
+        keyLight.position.y = 8 + tY * 3.5
+
+        // ·· Dice: independent parallax + spin-up + scatter on scroll
+        for (const d of dice) {
+          const { ox, oy, oz, pFactor, lerpSpeed } = d.userData
+
+          // Each die chases the mouse at its own speed
+          d.userData.pcX += (tX - d.userData.pcX) * lerpSpeed
+          d.userData.pcY += (tY - d.userData.pcY) * lerpSpeed
+
+          // Deeper dice move less; near dice move a lot — true depth parallax
+          const px = d.userData.pcX * pFactor * 3.2
+          const py = d.userData.pcY * pFactor * 2.0
+
+          // Rotation: spin up quadratically on scroll
+          const spinMult = 1 + sp * sp * 20
+          d.rotation.x += d.userData.rx * spinMult
+          d.rotation.y += d.userData.ry * spinMult
+          d.rotation.z += d.userData.rz * spinMult
+
+          // Scroll scatter: radial outward + z rush
+          const angle   = Math.atan2(oy, ox)
+          const radius  = Math.sqrt(ox * ox + oy * oy)
+          const scatter = sp * sp * 24
+          const weight  = 0.5 + radius / 9
+
+          d.position.x = ox + px + Math.cos(angle) * scatter * weight
+          d.position.y = oy + py + Math.sin(angle) * scatter * weight
+          d.position.z = oz      - sp * 14
+        }
+
+        // ·· Canvas fade on scroll
+        canvas.style.opacity = Math.max(0, 1 - sp * 2.4)
+
+        // ·· Particles: drift up, accelerate on scroll
+        const pSpeed = 0.004 + sp * 0.075
+        pMat.size = 0.055 + sp * 0.06
+        const pa = pGeo.attributes.position.array
+        for (let i = 0; i < P; i++) {
+          pa[i*3+1] += pSpeed
+          if (pa[i*3+1] > 12) pa[i*3+1] = -12
+        }
+        pGeo.attributes.position.needsUpdate = true
+
+        renderer.render(scene, camera)
+      })()
+    })()
+    </script>
+
   </body>
 </html>
